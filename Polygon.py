@@ -1,0 +1,78 @@
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from math import inf
+
+class Polygon(QWidget):
+    """ A class to represent a polygon
+    
+    Attributes
+    ----------
+    None
+    
+    Methods
+    -------
+    __len__():
+        Overloaded build-in function len()
+
+    __getitem__(idx):
+        Overloaded square brackets
+        
+    adVertex(q):
+        Add vertex to polygon
+        
+    isInMMB(q):
+        is point in minmax box of polygon?
+    
+    updateMMB(q)
+        update Minmax box
+    """
+    def __init__(self) -> None:
+        """Constructor for creating polygon"""
+        self.verticies : QPolygonF = QPolygonF()
+        self.min_x = inf
+        self.max_x = -inf
+        self.min_y = inf
+        self.max_y = -inf
+
+    def __len__(self):
+        """Overloaded build-in function len()"""
+        return len(self.verticies)
+    
+    def __getitem__(self, idx):
+        """Overloaded square brackets"""
+        return self.verticies[idx]
+    
+    def addVertex(self, q : QPointF) -> None:
+        """Add vertex to polygon
+        
+        Parameters
+        ----------
+        q : QPointF
+            Point which will be added to polygon
+        """
+        self.verticies.append(q)
+        
+    def isInMMB(self, q : QPointF) -> bool:
+        """Decide if point is in minmax box of the polygon
+        
+        Parameters
+        ----------
+        q : QPointF
+            Point which will be analyzed
+        """
+        return (    self.min_x <= q.x() and self.max_x >= q.x() and 
+                    self.min_y <= q.y() and self.max_y >= q.y())
+    
+    def updateMMB(self, q : QPointF) -> None:
+        """Update minmax box
+        
+        Parameters
+        ----------
+        q : QPointF
+            Point which will be analyzed
+        """
+        self.min_x = min(self.min_x, q.x())
+        self.min_y = min(self.min_y, q.y())
+        self.max_x = max(self.max_x, q.x())
+        self.max_y = max(self.max_y, q.y())
