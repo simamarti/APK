@@ -35,11 +35,11 @@ class Polygon(QWidget):
         self.min_y = inf
         self.max_y = -inf
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Overloaded build-in function len()"""
         return len(self.verticies)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx : int) -> QPointF:
         """Overloaded square brackets"""
         return self.verticies[idx]
     
@@ -60,6 +60,11 @@ class Polygon(QWidget):
         ----------
         q : QPointF
             Point which will be analyzed
+        
+        Returns
+        -------
+        True: Point is in the minmax box
+        False: Poin is not in the minmax box
         """
         return (    self.min_x <= q.x() and self.max_x >= q.x() and 
                     self.min_y <= q.y() and self.max_y >= q.y())

@@ -34,6 +34,11 @@ class Algorithms:
             Analyzed point
         polygons : list [Polygon]
             list of all loaded polygons
+            
+        Returns
+        -------
+        inBB : list
+            list of indexes of polygons whose minmax box contain point
         """
         inBB = []
         for idx, polygon in enumerate(polygons):
@@ -41,7 +46,7 @@ class Algorithms:
                 inBB.append(idx)
         return inBB
     
-    def rayCrossingAlgorithm(self, q : QPointF, pol : QPolygonF):
+    def rayCrossingAlgorithm(self, q : QPointF, pol : QPolygonF) -> bool:
         """Ray Crossing algorithm 
             
         Parameters
@@ -50,6 +55,11 @@ class Algorithms:
             Analyzed point
         pol : QPolygonF
             polygon
+            
+        Returns
+        -------
+        True: Point is in the polygon
+        False: Point is outside the polygon
         """
         # Inicialize amount of intersection
         k = 0
@@ -86,4 +96,4 @@ class Algorithms:
                     k += 1
                     
         # Point inside polygon       
-        return k%2
+        return bool(k%2)

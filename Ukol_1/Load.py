@@ -13,6 +13,11 @@ def load_polygons(path : str) -> list[QPolygonF]:
         ----------
         path : str
             Path to the file
+            
+        Returns
+        -------
+        painted polygons : list[QPolygonF]
+            list of polygons with transformed coordinates
     """
     with open(path, 'r', encoding = 'utf-8') as f:
         file = json.load(f)
@@ -58,4 +63,4 @@ def load_polygons(path : str) -> list[QPolygonF]:
             pol.updateMMB(point)
         painted_polygons.append(pol)
     
-    return painted_polygons, scale, dx, dy
+    return painted_polygons

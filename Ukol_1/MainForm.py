@@ -112,7 +112,7 @@ class Ui_MainWindow(object):
         openDialog.setNameFilter("*.json")
         if openDialog.exec():
             file = openDialog.selectedFiles()
-        self.Canvas.pols, self.Canvas.scale, self.Canvas.dx, self.Canvas.dy = load_polygons("Polygons.json")
+        self.Canvas.pols = load_polygons("Polygons.json")
 
     def pointPolygonClick(self):
         self.Canvas.switchDrawing()
@@ -135,7 +135,7 @@ class Ui_MainWindow(object):
         self.Canvas.intersect = []
         # Choose polygons with point in their minmax box
         indexes = alg.preProcessPolygons(q, self.Canvas.pols)
-        print(indexes)
+
         # Iterate throught choosen polygon
         for idx in indexes:
             if alg.rayCrossingAlgorithm(q, self.Canvas.pols[idx]):

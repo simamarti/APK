@@ -31,18 +31,15 @@ class Draw(QWidget):
     paintEvent(e)
         draw on the Canvas
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Constructor for class Draw"""
         super().__init__(*args, **kwargs)
         self.q = QPointF(-100, -100)
         self.pols = []
-        self.scale = 1
-        self.dx = 0
-        self.dy = 0
         self.addVertex = False
         self.intersect = []
     
-    def switchDrawing(self):
+    def switchDrawing(self) -> None:
         """Decide what will be drawn (point/polygon)"""
         # Change what will be drawn
         self.addVertex = not self.addVertex
@@ -57,7 +54,7 @@ class Draw(QWidget):
         # Return analyzed point
         return self.q
     
-    def clearData(self):
+    def clearData(self) -> None:
         """Clear Canvas"""        
         self.pols = []
         self.intersect = []
