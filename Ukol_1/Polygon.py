@@ -30,10 +30,10 @@ class Polygon(QWidget):
     def __init__(self) -> None:
         """Constructor for creating polygon"""
         self.verticies : QPolygonF = QPolygonF()
-        self.min_x = inf
-        self.max_x = -inf
-        self.min_y = inf
-        self.max_y = -inf
+        self.min_x : float = inf
+        self.max_x : float = -inf
+        self.min_y : float = inf
+        self.max_y : float = -inf
 
     def __len__(self) -> int:
         """Overloaded build-in function len()"""

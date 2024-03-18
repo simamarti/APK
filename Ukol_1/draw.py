@@ -34,10 +34,10 @@ class Draw(QWidget):
     def __init__(self, *args, **kwargs) -> None:
         """Constructor for class Draw"""
         super().__init__(*args, **kwargs)
-        self.q = QPointF(-100, -100)
-        self.pols = []
-        self.addVertex = False
-        self.intersect = []
+        self.q : QPointF = QPointF(-100, -100)
+        self.pols : list[QPolygonF] = []
+        self.addVertex : bool = False
+        self.intersect : list[int] = []
     
     def switchDrawing(self) -> None:
         """Decide what will be drawn (point/polygon)"""
