@@ -105,20 +105,18 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def openClick(self):
-        
-        openDialog = QtWidgets.QFileDialog()
-        openDialog.setDirectory('.')
-        openDialog.setFileMode(QtWidgets.QFileDialog.FileMode.ExistingFiles)
-        openDialog.setNameFilter("*.json")
-        if openDialog.exec():
-            file = openDialog.selectedFiles()
-        self.Canvas.pols = load_polygons("Polygons.json")
+        """Open file dialog and choose *.JSON file"""
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open File", directory="Data/.", filter="JSON file (*.json; *.geojson)")
+        if filename == "":
+            return None
+        self.Canvas.pols = load_polygons(filename)
 
     def pointPolygonClick(self):
+        """Decide if point or polygon will be added"""
         self.Canvas.switchDrawing()
     
     def rayCrossing(self):
-        
+        """Ray Crossinng algorithm on the click"""
         # Get data
         q = self.Canvas.getQ()
         pol = self.Canvas.getPols()
@@ -135,7 +133,7 @@ class Ui_MainWindow(object):
         self.Canvas.intersect = []
         # Choose polygons with point in their minmax box
         indexes = alg.preProcessPolygons(q, self.Canvas.pols)
-
+        print(len(indexes))
         # Iterate throught choosen polygon
         for idx in indexes:
             if alg.rayCrossingAlgorithm(q, self.Canvas.pols[idx]):
@@ -150,9 +148,11 @@ class Ui_MainWindow(object):
         messagebox.exec()
     
     def windingNumber(self):
+        """Winding number algorithm on the click"""
         pass
     
     def clear(self):
+        """Clear Canvas"""
         self.Canvas.clearData()
     
     def retranslateUi(self, MainWindow):
