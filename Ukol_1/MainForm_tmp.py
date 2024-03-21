@@ -51,12 +51,12 @@ class Ui_MainWindow(object):
         self.actionPolygon = QtGui.QAction(parent=MainWindow)
         self.actionPolygon.setCheckable(True)
         self.actionPolygon.setObjectName("actionPolygon")
-        self.actionDira = QtGui.QAction(parent=MainWindow)
-        self.actionDira.setCheckable(True)
+        self.actionBod = QtGui.QAction(parent=MainWindow)
+        self.actionBod.setCheckable(True)
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("images/icons/pointpol.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.actionDira.setIcon(icon2)
-        self.actionDira.setObjectName("actionDira")
+        self.actionBod.setIcon(icon2)
+        self.actionBod.setObjectName("actionBod")
         self.actionClear = QtGui.QAction(parent=MainWindow)
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap("images/icons/clear_all.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
@@ -74,7 +74,7 @@ class Ui_MainWindow(object):
         self.actionWinding_number_Algorithm.setObjectName("actionWinding_number_Algorithm")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionExit)
-        self.menuInput.addAction(self.actionDira)
+        self.menuInput.addAction(self.actionBod)
         self.menuInput.addSeparator()
         self.menuInput.addAction(self.actionClear)
         self.menuAnalyze.addAction(self.actionRay_Crossing_Algorithm)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionOpen)
         self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionDira)
+        self.toolBar.addAction(self.actionBod)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionRay_Crossing_Algorithm)
         self.toolBar.addSeparator()
@@ -100,7 +100,7 @@ class Ui_MainWindow(object):
         self.actionClear.triggered.connect(self.clear) # type: ignore
         self.actionWinding_number_Algorithm.triggered.connect(self.windingNumber) # type: ignore
         self.actionRay_Crossing_Algorithm.triggered.connect(self.rayCrossing) # type: ignore
-        self.actionDira.triggered.connect(self.makeHole) # type: ignore
+        self.actionBod.triggered.connect(self.pointPolygonClick) # type: ignore
         self.actionExit.triggered.connect(MainWindow.close) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -110,14 +110,17 @@ class Ui_MainWindow(object):
         if filename == "":
             return None
         self.Canvas.pols = load_polygons(filename)
-        
+
+    def pointPolygonClick(self):
+        """Decide if point or polygon will be added"""
+        self.Canvas.switchDrawing()
+    
     def rayCrossing(self):
         """Ray Crossinng algorithm on the click"""
         # Get data
         q = self.Canvas.getQ()
         pol = self.Canvas.getPols()
         
-        # Point was not choosen
         if q.x() <= 0 or q.y() <= 0 or not pol:
             return None
         
@@ -130,7 +133,7 @@ class Ui_MainWindow(object):
         self.Canvas.intersect = []
         # Choose polygons with point in their minmax box
         indexes = alg.preProcessPolygons(q, self.Canvas.pols)
-
+        print(len(indexes))
         # Iterate throught choosen polygon
         for idx in indexes:
             if alg.rayCrossingAlgorithm(q, self.Canvas.pols[idx]):
@@ -143,49 +146,15 @@ class Ui_MainWindow(object):
         
         # Show analysis
         messagebox.exec()
-        
+    
     def windingNumber(self):
         """Winding number algorithm on the click"""
-        """Ray Crossinng algorithm on the click"""
-        # Get data
-        q = self.Canvas.getQ()
-        pol = self.Canvas.getPols()
-        
-        # Point was not choosen
-        if q.x() <= 0 or q.y() <= 0 or not pol:
-            return None
-        
-        # Run analysis
-        messagebox = QtWidgets.QMessageBox()
-        messagebox.setWindowTitle("Analyze point and polygon position")
-        
-        # Point inside/outside
-        alg = Algorithms()
-        self.Canvas.intersect = []
-        # Choose polygons with point in their minmax box
-        indexes = alg.preProcessPolygons(q, self.Canvas.pols)
-
-        # Iterate throught choosen polygon
-        for idx in indexes:
-            if alg.windingNumber(q, self.Canvas.pols[idx]):
-                self.Canvas.intersect.append(idx)
-        
-        if self.Canvas.intersect:
-            messagebox.setText("Inside")
-        else:
-            messagebox.setText("Outside")
-        
-        # Show analysis
-        messagebox.exec()
+        pass
     
     def clear(self):
         """Clear Canvas"""
         self.Canvas.clearData()
-        
-    def makeHole(self):
-        """Switch drawing between point and hole"""
-        self.Canvas.switchDrawing()
-        
+    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Point and polygon position"))
@@ -198,7 +167,7 @@ class Ui_MainWindow(object):
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionExit.setToolTip(_translate("MainWindow", "Close application"))
         self.actionPolygon.setText(_translate("MainWindow", "Polygon"))
-        self.actionDira.setText(_translate("MainWindow", "Udělat díru"))
+        self.actionBod.setText(_translate("MainWindow", "Point/polygon"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionRay_Crossing_Algorithm.setText(_translate("MainWindow", "Ray Crossing Algorithm"))
         self.actionWinding_number_Algorithm.setText(_translate("MainWindow", "Winding number Algorithm"))

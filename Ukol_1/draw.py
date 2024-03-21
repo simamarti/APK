@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
+from Polygon import Polygon
 
 class Draw(QWidget):
     """ A class for drawing on the Canvas
@@ -35,14 +36,19 @@ class Draw(QWidget):
         """Constructor for class Draw"""
         super().__init__(*args, **kwargs)
         self.q : QPointF = QPointF(-100, -100)
-        self.pols : list[QPolygonF] = []
-        self.addVertex : bool = False
+        self.pols : list[Polygon] = []
+        self.hole : QPolygonF = QPolygonF()
+        self.addHole : bool = False
         self.intersect : list[int] = []
     
     def switchDrawing(self) -> None:
-        """Decide what will be drawn (point/polygon)"""
+        """Decide what will be drawn (point/hole)"""
         # Change what will be drawn
-        self.addVertex = not self.addVertex
+        self.addHole = not self.addHole
+        
+        # Color all to green (point is not in any polygons)
+        self.intersect = []
+        self.repaint()
     
     def getPols(self) -> list:
         """Get polygons"""        
@@ -57,6 +63,7 @@ class Draw(QWidget):
     def clearData(self) -> None:
         """Clear Canvas"""        
         self.pols = []
+        self.hole = []
         self.intersect = []
         self.q.setX(-100)
         self.q.setY(-100)
@@ -76,23 +83,29 @@ class Draw(QWidget):
         x = e.position().x()
         y = e.position().y()
         
-        if self.addVertex: 
-            # ZRUŠIT??
+        if self.addHole: 
+            # „Delete“ point from Canvas
+            self.q.setX(-100)
+            self.q.setY(-100)
+            
             # Create temporary point
             p = QPointF(x, y)
                 
             # Add point to polygon
-            self.pols.append(p)
-            print(len(self.pols))
+            self.hole.append(p)
+            if len(self.hole) > 1:
+                path_hole = QPainterPath()
+                path_hole.addPolygon(self.hole)
+                for pol in self.pols:
+                    pol.path = pol.path.subtracted(path_hole)
         else:
             self.q.setX(x)
             self.q.setY(y)
-            
             self.intersect = []
         
         # Repaint screen
         self.repaint()
-        
+
     def paintEvent(self, e: QPaintEvent):
         """Draw on the Canvas
             
@@ -115,18 +128,18 @@ class Draw(QWidget):
         
         # Draw polygons
         for polygon in self.pols:
-            qp.drawPolygon(polygon.verticies)
+            qp.drawPath(polygon.path)
         
         if self.intersect:
             qp.setPen(Qt.GlobalColor.yellow)
             qp.setBrush(Qt.GlobalColor.red)
             for pol in self.intersect:
-                qp.drawPolygon(self.pols[pol].verticies)
+                qp.drawPath(self.pols[pol].path)
         elif self.pols:
             qp.setPen(Qt.GlobalColor.red)
             qp.setBrush(Qt.GlobalColor.green)
             for pol in self.intersect:
-                qp.drawPolygon(self.pols[pol].verticies)
+                qp.drawPath(self.pols[pol].path)
             
         # Draw point
         qp.setPen(Qt.GlobalColor.yellow)

@@ -46,7 +46,7 @@ class Algorithms:
                 inBB.append(idx)
         return inBB
     
-    def rayCrossingAlgorithm(self, q : QPointF, pol : QPolygonF) -> bool:
+    def rayCrossingAlgorithm(self, q : QPointF, polygon : Polygon) -> int:
         """Ray Crossing algorithm 
             
         Parameters
@@ -58,42 +58,68 @@ class Algorithms:
             
         Returns
         -------
-        True: Point is in the polygon
-        False: Point is outside the polygon
+        0: Point is in the polygon
+        1: Point is outside the polygon
         """
+        parts = polygon.path.toSubpathPolygons()
         # Inicialize amount of intersection
         k = 0
         
-        # Amount of vertices
-        n = len(pol)
-        
-        # process all segments
-        for i in range(n):
-            
-            # Reduce coordinates
-            xir = pol[i].x() - q.x()
-            xiir = pol[(i+1)%n].x() - q.x()
-            
-            yir = pol[i].y() - q.y()
-            yiir = pol[(i+1)%n].y() - q.y()
-            
-            # Point is vertex
-            if not xir and not yir:
-                print("Point is vertex")
-                return 1
+        for path in parts:
 
-            # Point is on the Edge
-            p_1 = array([xir, yir])
-            p_2 = array([xiir, yiir])
-            if (norm(-p_1) + norm(-p_2) - norm(p_2 - p_1)) < finfo(float64).eps:
-                return 1
+            # Amount of vertices
+            n = len(path)
             
-            # Suitable segment?
-            if ((yiir > 0) and (yir <= 0)) or ((yir > 0) and (yiir <= 0)):
-                # Compute inersecion
-                xm = (xir*yiir-xiir*yir)/(yir - yiir)
-                if xm > 0:
-                    k += 1
+            # process all segments
+            for i in range(n):
+                
+                # Reduce coordinates
+                xir = path[i].x() - q.x()
+                xiir = path[(i+1)%n].x() - q.x()
+                
+                yir = path[i].y() - q.y()
+                yiir = path[(i+1)%n].y() - q.y()
+                
+                # Point is vertex
+                if not xir and not yir:
+                    print("Point is vertex")
+                    return 1
+
+                # Point is on the Edge
+                p_1 = array([xir, yir])
+                p_2 = array([xiir, yiir])
+                if (norm(-p_1) + norm(-p_2) - norm(p_2 - p_1)) < finfo(float64).eps:
+                    return 1
+                
+                # Suitable segment?
+                if ((yiir > 0) and (yir <= 0)) or ((yir > 0) and (yiir <= 0)):
+                    # Compute inersecion
+                    xm = (xir*yiir-xiir*yir)/(yir - yiir)
+                    if xm > 0:
+                        k += 1
                     
         # Point inside polygon       
-        return bool(k%2)
+        return k%2
+    
+    def windingNumber(self, p : QPointF, polygon : Polygon) -> int:
+        """Winding number algorithm 
+            
+        Parameters
+        ----------
+        q : QPointF
+            Analyzed point
+        pol : Polygon
+            polygon
+            
+        Returns
+        -------
+        1: Point is in the polygon
+        0: Point is outside the polygon
+        """
+        parts = polygon.path.toSubpathPolygons()
+        # Inicialize amount of intersection
+        k = 0
+        
+        for path in parts:
+            pass
+        return 0

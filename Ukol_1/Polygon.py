@@ -26,10 +26,14 @@ class Polygon(QWidget):
     
     updateMMB(q)
         update Minmax box
+        
+    convertPolToPath()
+        Convert QPolyfonF to QPainterPath
     """
     def __init__(self) -> None:
         """Constructor for creating polygon"""
-        self.verticies : QPolygonF = QPolygonF()
+        self.verticies : QPolygonF =  QPolygonF()
+        self.path = QPainterPath()
         self.min_x : float = inf
         self.max_x : float = -inf
         self.min_y : float = inf
@@ -48,7 +52,7 @@ class Polygon(QWidget):
         
         Parameters
         ----------
-        q : QPointF
+        q : QPainterpath
             Point which will be added to polygon
         """
         self.verticies.append(q)
@@ -81,3 +85,13 @@ class Polygon(QWidget):
         self.min_y = min(self.min_y, q.y())
         self.max_x = max(self.max_x, q.x())
         self.max_y = max(self.max_y, q.y())
+        
+    def convertPolToPath(self) -> None:
+        """Convert QPolyfonF to QPainterPath
+        
+        Parameters
+        ----------
+        None
+        """
+        self.verticies.append(self.verticies[0])     
+        self.path.addPolygon(self.verticies)
