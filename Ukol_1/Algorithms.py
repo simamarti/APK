@@ -82,9 +82,14 @@ class Algorithms:
                 
                 # Point is vertex
                 if not xir and not yir:
-                    print("Point is vertex")
                     return 1
 
+                # Ray intersects vertex
+                if not yir:
+                    iyr = path[(i-1)%n].y() - q.y()
+                    if iyr*yiir < 0:
+                        k = k + 1
+                        
                 # Point is on the Edge
                 p_1 = array([xir, yir])
                 p_2 = array([xiir, yiir])
@@ -101,7 +106,7 @@ class Algorithms:
         # Point inside polygon       
         return k%2
     
-    def windingNumber(self, p : QPointF, polygon : Polygon) -> int:
+    def windingNumber(self, q : QPointF, polygon : Polygon) -> int:
         """Winding number algorithm 
             
         Parameters
@@ -121,5 +126,42 @@ class Algorithms:
         k = 0
         
         for path in parts:
-            pass
-        return 0
+            
+            n = len(path)
+            # process all segments
+            for i in range(n):
+                
+                # Reduce coordinates
+                xir = path[i].x() - q.x()
+                xiir = path[(i+1)%n].x() - q.x()
+                
+                yir = path[i].y() - q.y()
+                yiir = path[(i+1)%n].y() - q.y()
+                
+                # Point is vertex
+                if not xir and not yir:
+                    return 1
+
+                # Ray intersects vertex
+                if not yir:
+                    iyr = path[(i-1)%n].y() - q.y()
+                    if iyr*yiir < 0:
+                        k = k + 1
+                        
+                # Point is on the Edge
+                p_1 = array([xir, yir])
+                p_2 = array([xiir, yiir])
+                if (norm(-p_1) + norm(-p_2) - norm(p_2 - p_1)) < finfo(float64).eps:
+                    return 1
+                
+                if ((yiir > 0) and (yir <= 0)):
+                    # Compute inersecion
+                    xm = (xir*yiir-xiir*yir)/(yir - yiir)
+                    if xm > 0:
+                        k += 1
+                elif ((yir > 0) and (yiir <= 0)):
+                    # Compute inersecion
+                    xm = (xir*yiir-xiir*yir)/(yir - yiir)
+                    if xm > 0:
+                        k -= 1
+        return k

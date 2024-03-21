@@ -95,6 +95,7 @@ class Draw(QWidget):
             self.hole.append(p)
             if len(self.hole) > 1:
                 path_hole = QPainterPath()
+                print(type(path_hole))
                 path_hole.addPolygon(self.hole)
                 for pol in self.pols:
                     pol.path = pol.path.subtracted(path_hole)

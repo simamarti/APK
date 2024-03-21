@@ -198,7 +198,7 @@ class Ui_MainWindow(object):
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionExit.setToolTip(_translate("MainWindow", "Close application"))
         self.actionPolygon.setText(_translate("MainWindow", "Polygon"))
-        self.actionDira.setText(_translate("MainWindow", "Udělat díru"))
+        self.actionDira.setText(_translate("MainWindow", "Make Hole"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionRay_Crossing_Algorithm.setText(_translate("MainWindow", "Ray Crossing Algorithm"))
         self.actionWinding_number_Algorithm.setText(_translate("MainWindow", "Winding number Algorithm"))
