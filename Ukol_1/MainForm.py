@@ -109,6 +109,7 @@ class Ui_MainWindow(object):
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open File", directory="Data/.", filter="JSON file (*.json; *.geojson)")
         if filename == "":
             return None
+        self.Canvas.clearData()
         self.Canvas.pols = load_polygons(filename)
         
     def rayCrossing(self):
@@ -121,9 +122,7 @@ class Ui_MainWindow(object):
         if q.x() <= 0 or q.y() <= 0 or not pol:
             return None
         
-        # Run analysis
-        messagebox = QtWidgets.QMessageBox()
-        messagebox.setWindowTitle("Analyze point and polygon position")
+        
         
         # Point inside/outside
         alg = Algorithms()
@@ -136,17 +135,18 @@ class Ui_MainWindow(object):
             if alg.rayCrossingAlgorithm(q, self.Canvas.pols[idx]):
                 self.Canvas.intersect.append(idx)
         
-        if self.Canvas.intersect:
-            messagebox.setText("Inside")
-        else:
-            messagebox.setText("Outside")
+        if not self.Canvas.intersect:
+            messagebox = QtWidgets.QMessageBox()
+            messagebox.setWindowTitle("Ray Crossing Algorithm")
+            messagebox.setText("Point is not intersecting any polygon")
+            
+            # Show analysis
+            messagebox.exec()
         
-        # Show analysis
-        messagebox.exec()
+        self.Canvas.repaint()
         
     def windingNumber(self):
         """Winding number algorithm on the click"""
-        """Ray Crossinng algorithm on the click"""
         # Get data
         q = self.Canvas.getQ()
         pol = self.Canvas.getPols()
@@ -154,10 +154,6 @@ class Ui_MainWindow(object):
         # Point was not choosen
         if q.x() <= 0 or q.y() <= 0 or not pol:
             return None
-        
-        # Run analysis
-        messagebox = QtWidgets.QMessageBox()
-        messagebox.setWindowTitle("Analyze point and polygon position")
         
         # Point inside/outside
         alg = Algorithms()
@@ -170,14 +166,16 @@ class Ui_MainWindow(object):
             if alg.windingNumber(q, self.Canvas.pols[idx]):
                 self.Canvas.intersect.append(idx)
         
-        if self.Canvas.intersect:
-            messagebox.setText("Inside")
-        else:
-            messagebox.setText("Outside")
+        if not self.Canvas.intersect:
+            messagebox = QtWidgets.QMessageBox()
+            messagebox.setWindowTitle("Winding Number Algorithm")
+            messagebox.setText("Point is not intersecting any polygon")
+            
+            # Show analysis
+            messagebox.exec()
         
-        # Show analysis
-        messagebox.exec()
-    
+        self.Canvas.repaint()
+            
     def clear(self):
         """Clear Canvas"""
         self.Canvas.clearData()

@@ -93,5 +93,5 @@ class Polygon(QWidget):
         ----------
         None
         """
-        self.verticies.append(self.verticies[0])     
+        self.verticies.append(self.verticies[0])        # Connect last point with first point     
         self.path.addPolygon(self.verticies)

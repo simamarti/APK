@@ -26,21 +26,20 @@ def load_polygons(path : str) -> list[QPainterPath]:
     dx = 0; dy = 0; scale = 0
     min_x = inf; max_x = -inf; min_y = inf; max_y = -inf 
     
+    # Compute min_max box
     for region in polygons:
         points = region['POINTS']
-        for point in points:
-            if point[0] == "N" or point[1] == "N":
-                continue
-            x = float(point[0])
-            y = float(point[1])
-            min_x = min(min_x, x)
-            max_x = max(max_x, x)
-            min_y = min(min_y, y)
-            max_y = max(max_y, y) 
+        
+        for p in points:
+            min_x = min(min_x, float(p[0]))
+            max_x = max(max_x, float(p[0]))
+            min_y = min(min_y, float(p[1]))
+            max_y = max(max_y, float(p[1])) 
     
     width = 800
     height = 600
     offset = 50
+    # Compute shifts and scalling factor
     dx = (max_x + min_x)/2; dy = (max_y + min_y)/2
     
     if abs(max_x - min_x)/(width - offset) > abs(max_y - min_y)/(height - offset):
@@ -48,12 +47,14 @@ def load_polygons(path : str) -> list[QPainterPath]:
     else:
         scale = max(1, abs(max_y - min_y)/(height - offset))
     
+    # transform coordinates
     painted_polygons = transformPolygons(polygons, scale, dx, dy, width, height, offset)
     painted_holes = []
     if 'HOLES' in file:
         holes = file['HOLES']
         painted_holes = transformPolygons(holes, scale, dx, dy, width, height, offset)
 
+    # Convert QPolygonF to QPainterPath
     path_polygons = []
     path_holes = []
     for pol in painted_polygons:
@@ -63,6 +64,7 @@ def load_polygons(path : str) -> list[QPainterPath]:
         hole.convertPolToPath()
         path_holes.append(hole)
 
+    # Make holes in polygons
     for polygon in path_polygons:
         for hole in path_holes:
             polygon.path = polygon.path.subtracted(hole.path)
@@ -100,8 +102,6 @@ def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : flo
         points = region['POINTS']
         pol = Polygon()
         for point in points:
-            if point[0] == "N" or point[1] == "N":
-                continue
             new_x = (float(point[0]) - dx)/scale + width/2
             new_y = (-1)*((float(point[1]) - dy)/scale + height/2) + height - offset
             point = QPointF(new_x, new_y)

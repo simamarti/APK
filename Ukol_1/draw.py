@@ -63,7 +63,7 @@ class Draw(QWidget):
     def clearData(self) -> None:
         """Clear Canvas"""        
         self.pols = []
-        self.hole = []
+        self.hole = QPolygonF()
         self.intersect = []
         self.q.setX(-100)
         self.q.setY(-100)
@@ -91,19 +91,20 @@ class Draw(QWidget):
             # Create temporary point
             p = QPointF(x, y)
                 
-            # Add point to polygon
+            # Add point to hole
             self.hole.append(p)
+            
+            # Create path from hole and subtracted from polygons
             if len(self.hole) > 1:
                 path_hole = QPainterPath()
-                print(type(path_hole))
                 path_hole.addPolygon(self.hole)
                 for pol in self.pols:
                     pol.path = pol.path.subtracted(path_hole)
-        else:
+        else:               # or point will be inserted
             self.q.setX(x)
             self.q.setY(y)
-            self.intersect = []
-        
+            self.intersect = []         # Clear array with indexes of highlighted polygons
+
         # Repaint screen
         self.repaint()
 
@@ -130,13 +131,13 @@ class Draw(QWidget):
         # Draw polygons
         for polygon in self.pols:
             qp.drawPath(polygon.path)
-        
-        if self.intersect:
+
+        if self.intersect:                          # Draw polygons with point
             qp.setPen(Qt.GlobalColor.yellow)
             qp.setBrush(Qt.GlobalColor.red)
             for pol in self.intersect:
                 qp.drawPath(self.pols[pol].path)
-        elif self.pols:
+        elif self.pols:                             # or redraw all polygon to green
             qp.setPen(Qt.GlobalColor.red)
             qp.setBrush(Qt.GlobalColor.green)
             for pol in self.intersect:
