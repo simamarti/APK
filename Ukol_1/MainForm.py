@@ -54,7 +54,7 @@ class Ui_MainWindow(object):
         self.actionDira = QtGui.QAction(parent=MainWindow)
         self.actionDira.setCheckable(True)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/icons/pointpol.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/icons/hole.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionDira.setIcon(icon2)
         self.actionDira.setObjectName("actionDira")
         self.actionClear = QtGui.QAction(parent=MainWindow)
