@@ -164,9 +164,9 @@ class Algorithms:
                 # Compute Winding Number
                 angle = self.angleTwoLine(q, startPoint, endPoint)
                 if det < -eps:    
-                    omega += angle
-                elif det > eps:                 
                     omega -= angle
+                elif det > eps:                 
+                    omega += angle
                 elif abs(angle - pi) < eps:           # Point is on the Edge
                     return 1
             if abs(abs(omega) - 2*pi) < eps:             # Point is inside the path
