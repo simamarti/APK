@@ -10,7 +10,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from Algorithms import Algorithms
 from Load import load_buildings
 from math import inf
-
+# C:\Users\simam\Onedrive\Dokumenty\GitHub\APK\Ukol_2
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")

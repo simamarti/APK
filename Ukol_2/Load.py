@@ -59,7 +59,8 @@ def load_buildings(path : str) -> list[QPolygonF]:
     offset = 50
     # Compute shifts and scalling factor
     dx = (max_x + min_x)/2; dy = (max_y + min_y)/2
-    
+    print(abs(max_x - min_x)/(width - offset))
+    print(abs(max_y - min_y)/(height - offset))
     scale = max(1, abs(max_x - min_x)/(width - offset), abs(max_y - min_y)/(height - offset))
 
     # transform coordinates
