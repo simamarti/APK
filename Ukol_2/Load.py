@@ -93,7 +93,7 @@ def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : flo
         painted polygons : list[Polygon]
             list of polygons with transformed coordinates
     """
-    painted_polygons = []    
+    painted_buildings = []    
     
     for region in polygons:
         pol = Building()
@@ -109,6 +109,14 @@ def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : flo
             new_y = (-1)*((float(point[1]) - dy)/scale + height/2) + height - offset
             point = QPointF(new_x, new_y)
             pol.addVertex(point)
-        painted_polygons.append(pol)
+        painted_buildings.append(pol)
         
-    return painted_polygons
+    minX = inf; maxX = -inf; minY = inf; maxY = -inf
+    for building in painted_buildings:
+        for vertex in building.building:
+            minX = min(minX, vertex.x())
+            minY = min(minY, vertex.y())
+            maxX = max(maxX, vertex.x())
+            maxY = max(maxY, vertex.y())
+    print(f"<{minX}, {maxX}><{minY}, {maxY}>")
+    return painted_buildings

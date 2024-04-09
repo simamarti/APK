@@ -7,6 +7,7 @@ from math import acos, cos, sin, sqrt, inf, atan2
 from numpy import array, cov
 from numpy.linalg import svd
 from Building import Building
+from copy import deepcopy
 
 class Algorithms:
     
@@ -166,22 +167,13 @@ class Algorithms:
     def slope(self, diagonal : list[QPointF, QPointF]) -> float:
         
         p1 = diagonal[0]; p2 = diagonal[1]
+        p3 = QPointF(0, 0); p4 = QPointF(100, 0)              #x axis
+        if p2.y() < p1.y():
+            tmp = deepcopy(p1)
+            p1 = deepcopy(p2)
+            p2 = deepcopy(tmp)
         
-        if p2.y() < p1.y() and p2.x() < p1.x():   # 3rd quadrant -> 1st quadrant
-            tmp = p1
-            p1 = p2
-            p2 = tmp
-        elif p2.y() < p1.y() and p2.x() > p1.x():   # 4th quadrant -> 2nd quadrant
-            tmp = p1
-            p1 = p2
-            p2 = tmp
-            
-        dx = p1.x() - p2.x()
-        dy = p1.y() - p2.y()
-        
-        sigma = atan2(dy, dx)
-        if p1.y() < p2.y() and p1.x() > p2.x():   # 2nd quadrant
-            sigma = 180 - sigma
+        sigma = self.getTwoLineAngle(p1, p2, p3, p4)
             
         return sigma
         
@@ -256,7 +248,7 @@ class Algorithms:
         mmb_unrot = self.rotate(mmb_min, sigma_min) # vstup - QPolygonF
         
         # Resize rectangle
-        mmb_res = self.resizeRectangle(mmb_unrot, pol.building)
+        mmb_res = self.resizeRectangle(mmb_unrot, pol)
         
         return mmb_res
     
