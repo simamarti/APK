@@ -23,16 +23,12 @@ class Draw(QWidget):
          
     def clearData(self):
         # Clear building
-        self.building = []
-        
-        # Clear MBR
-        self.mbr = []
-        
-        # Repaint screen
-        self.repaint()
+        self.buildings = []
         
     def clearmbr(self):
-        self.mbr = []
+        
+        for building in self.buildings:
+            building.building_generalize = QPolygonF()
         
     def mousePressEvent(self, e: QMouseEvent):
         

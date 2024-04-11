@@ -91,12 +91,17 @@ class Ui_MainWindow(object):
         icon9.addPixmap(QtGui.QPixmap("Images/Jarvis_scan.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionJarvis_Scan.setIcon(icon9)
         self.actionJarvis_Scan.setObjectName("actionJarvis_Scan")
-        self.actionL_da_ob_lka = QtGui.QAction(parent=MainWindow)
-        self.actionL_da_ob_lka.setCheckable(True)
+        self.actionGrahamScan = QtGui.QAction(parent=MainWindow)
+        self.actionGrahamScan.setCheckable(True)
         icon10 = QtGui.QIcon()
         icon10.addPixmap(QtGui.QPixmap("Images/Lída_scan.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-        self.actionL_da_ob_lka.setIcon(icon10)
-        self.actionL_da_ob_lka.setObjectName("actionL_da_ob_lka")
+        self.actionGrahamScan.setIcon(icon10)
+        self.actionGrahamScan.setObjectName("actionL_da_ob_lka")
+        self.actionValidation = QtGui.QAction(parent=MainWindow)
+        icon11 = QtGui.QIcon()
+        icon11.addPixmap(QtGui.QPixmap("Images/Validate.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.actionValidation.setIcon(icon11)
+        self.actionValidation.setObjectName("actionValidation")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionClose_2)
@@ -107,7 +112,9 @@ class Ui_MainWindow(object):
         self.menuSimplify.addAction(self.actionWeighted_Bisector)
         self.menuSimplify.addSeparator()
         self.menuSimplify.addAction(self.actionJarvis_Scan)
-        self.menuSimplify.addAction(self.actionL_da_ob_lka)
+        self.menuSimplify.addAction(self.actionGrahamScan)
+        self.menuView.addAction(self.actionValidation)
+        self.menuView.addSeparator()
         self.menuView.addAction(self.actionClear_results)
         self.menuView.addSeparator()
         self.menuView.addAction(self.actionClear_all)
@@ -123,7 +130,9 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionWeighted_Bisector)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionJarvis_Scan)
-        self.toolBar.addAction(self.actionL_da_ob_lka)
+        self.toolBar.addAction(self.actionGrahamScan)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actionValidation)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionClear_results)
         self.toolBar.addAction(self.actionClear_all)
@@ -137,11 +146,32 @@ class Ui_MainWindow(object):
         self.actionClear_results.triggered.connect(self.clearClick) # type: ignore
         self.actionClose_2.triggered.connect(MainWindow.close) # type: ignore
         self.actionJarvis_Scan.triggered.connect(self.jarvisScan) # type: ignore
-        self.actionL_da_ob_lka.triggered.connect(self.lidaScan) # type: ignore
+        self.actionGrahamScan.triggered.connect(self.grahamScan) # type: ignore
         self.actionLongest_Edge.triggered.connect(self.longestEdge) # type: ignore
         self.actionWall_Average.triggered.connect(self.wallAverage) # type: ignore
         self.actionWeighted_Bisector.triggered.connect(self.weightedBisector) # type: ignore
+        self.actionValidation.triggered.connect(self.validation) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+    
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Simplify buildings"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuSimplify.setTitle(_translate("MainWindow", "Simplify"))
+        self.menuView.setTitle(_translate("MainWindow", "View"))
+        self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
+        self.actionOpen.setText(_translate("MainWindow", "Open file"))
+        self.actionClose_2.setText(_translate("MainWindow", "Exit"))
+        self.actionMinimum_Area_Enclosing_Rectangle.setText(_translate("MainWindow", "Minimum Area Enclosing Rectangle"))
+        self.actionPCA.setText(_translate("MainWindow", "PCA"))
+        self.actionClear_results.setText(_translate("MainWindow", "Clear results"))
+        self.actionClear_all.setText(_translate("MainWindow", "Clear all"))
+        self.actionLongest_Edge.setText(_translate("MainWindow", "Longest Edge"))
+        self.actionWall_Average.setText(_translate("MainWindow", "Wall Average"))
+        self.actionWeighted_Bisector.setText(_translate("MainWindow", "Weighted Bisector"))
+        self.actionJarvis_Scan.setText(_translate("MainWindow", "Jarvis Scan"))
+        self.actionGrahamScan.setText(_translate("MainWindow", "Graham Scan"))
+        self.actionValidation.setText(_translate("MainWindow", "Validation"))
         
     def openClick(self):
         """Open file dialog and choose *.JSON file"""
@@ -162,9 +192,9 @@ class Ui_MainWindow(object):
             #Simplify building
             simplify = None
             if self.Canvas.jarvis:
-                simplify = a.createMBR(building, a.jarvisScan)
+                simplify = a.createMBR(building.building, a.jarvisScan)
             else:
-                simplify = a.createMBR(building, a.lidaScan)
+                simplify = a.createMBR(building.building, a.grahamScan)
             
             building.setBuildingGeneralize(simplify)     
         
@@ -204,9 +234,9 @@ class Ui_MainWindow(object):
     
     def jarvisScan(self):
         self.Canvas.jarvis = True
-        self.actionL_da_ob_lka.setChecked(False)
+        self.actionGrahamScan.setChecked(False)
     
-    def lidaScan(self):
+    def grahamScan(self):
         self.Canvas.jarvis = False
         self.actionJarvis_Scan.setChecked(False)
     
@@ -261,6 +291,19 @@ class Ui_MainWindow(object):
         #Repaint screen
         self.Canvas.repaint()
 
+    def validation(self):
+        alg = Algorithms()
+        
+        text = alg.validation(self.Canvas.buildings)
+        if text == "":
+            return
+        messagebox = QtWidgets.QMessageBox()
+        messagebox.setWindowTitle("Validation")
+        messagebox.setText(text)
+            
+        # Show analysis
+        messagebox.exec()
+        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Simplify buildings"))
@@ -278,7 +321,7 @@ class Ui_MainWindow(object):
         self.actionWall_Average.setText(_translate("MainWindow", "Wall Average"))
         self.actionWeighted_Bisector.setText(_translate("MainWindow", "Weighted Bisector"))
         self.actionJarvis_Scan.setText(_translate("MainWindow", "Jarvis Scan"))
-        self.actionL_da_ob_lka.setText(_translate("MainWindow", "Lída Scan"))
+        self.actionGrahamScan.setText(_translate("MainWindow", "Graham Scan"))
 from Draw import Draw
 
 
