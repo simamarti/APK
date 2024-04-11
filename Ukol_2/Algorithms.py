@@ -295,7 +295,54 @@ class Algorithms:
         raise NotImplementedError("Method longest Edge has not been implemented yet")
     
     def wallAverage(self, pol : QPolygonF) -> QPolygonF:
-        raise NotImplementedError("Method Wall Average has not been implemented yet")
+        # Create enclosing rectangle using Wall Average
+        n = len(pol)
+        
+        # Calculate sigma
+        d_x = pol[1].x() - pol[0].x()
+        d_y = pol[1].y() - pol[0].y()
+        sigma = atan2(d_y, d_x)
+        
+        # Average remainder
+        av_r = 0
+        
+        # Process all edges
+        for i in range(1, n):
+            # Compute sigma for current segment
+            d_x_i = pol[(i + 1)%n].x() - pol[i].x()
+            d_y_i = pol[(i + 1)%n].y() - pol[i].y()
+            sigma_i = atan2(d_y_i, d_x_i)
+            # Compute direction difference
+            dir_dif = sigma_i - sigma
+            # Adjustment when direction difference is less than 0
+            if dir_dif < 0:
+                dir_dif += 2 * pi
+            # Fraction by pi/2
+            k_i = round((2 * dir_dif)/pi)
+            # Calculate remainder for current segment
+            rem_i = dir_dif - (k_i * (pi/2))
+            # Update average remainder
+            av_r += rem_i  
+        
+        # Compute the average remainder
+        av_r = av_r/n
+        
+        # Average rotation
+        sigma_av = sigma + av_r
+        
+        # Rotate polygon by -sigma
+        pol_unrot = self.rotate(pol, -sigma_av)
+        
+        # Find min-max box
+        mmb = self.mmb(pol_unrot)
+        
+        # Rotate min-max box
+        er = self.rotate(mmb, sigma_av)
+        
+        # Resize enclosing rectangle 
+        er_r = self.resizeRectangle(er, pol)
+        
+        return er_r
 
     def weightedBisector(self, pol : QPolygonF) -> QPolygonF:
     
