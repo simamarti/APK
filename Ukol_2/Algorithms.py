@@ -292,8 +292,37 @@ class Algorithms:
         return er_r
         
     def longestEdge(self, pol : QPolygonF) -> QPolygonF:
-        raise NotImplementedError("Method longest Edge has not been implemented yet")
-    
+        # Create enclosing rectangle using Longest Edge
+        
+        n = len(pol)
+        # Initialize longest edge
+        longest_edge = 0
+        
+        # Process all edges
+        for i in range(n):
+            # Get length of the current edge
+            edge_length = self.l2(pol[i], pol[(i + 1)%n])
+            # Find the longest edge of the building
+            if edge_length > longest_edge:
+                longest_edge = edge_length
+                d_x = pol[(i + 1) % n].x() - pol[i].x()
+                d_y = pol[(i + 1) % n].y() - pol[i].y()
+                # Find slope angle of longest edge
+                angle = atan2(d_y, d_x)
+                
+        # Rotate polygon by -sigma
+        pol_unrot = self.rotate(pol, angle)
+        
+        # Find min-max box
+        mmb = self.mmb(pol_unrot)
+        
+        # Rotate min-max box
+        er = self.rotate(mmb, angle)
+        
+        # Resize enclosing rectangle 
+        er_r = self.resizeRectangle(er, pol)
+        
+        return er_r
     def wallAverage(self, pol : QPolygonF) -> QPolygonF:
         # Create enclosing rectangle using Wall Average
         n = len(pol)
