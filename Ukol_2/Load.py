@@ -59,16 +59,14 @@ def load_buildings(path : str) -> list[QPolygonF]:
     offset = 50
     # Compute shifts and scalling factor
     dx = (max_x + min_x)/2; dy = (max_y + min_y)/2
-    print(abs(max_x - min_x)/(width - offset))
-    print(abs(max_y - min_y)/(height - offset))
     scale = max(1, abs(max_x - min_x)/(width - offset), abs(max_y - min_y)/(height - offset))
 
     # transform coordinates
-    painted_polygons = transformPolygons(polygons, scale, dx, dy, width, height, offset)
+    painted_polygons = transformBuildings(polygons, scale, dx, dy, width, height, offset)
    
     return painted_polygons
 
-def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : float, width : int, height : int, offset : int) -> list[Building]:
+def transformBuildings(buildings : list[dict], scale : float, dx : float, dy : float, width : int, height : int, offset : int) -> list[Building]:
     """Transform polygons to new coordinates which are compatible with canvas coordinates
         
         Parameters
@@ -95,7 +93,7 @@ def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : flo
     """
     painted_buildings = []    
     
-    for region in polygons:
+    for region in buildings:
         pol = Building()
         points = region['POINTS']
         if len(points) < 3:
@@ -110,13 +108,5 @@ def transformPolygons(polygons : list[dict], scale : float, dx : float, dy : flo
             point = QPointF(new_x, new_y)
             pol.addVertex(point)
         painted_buildings.append(pol)
-        
-    minX = inf; maxX = -inf; minY = inf; maxY = -inf
-    for building in painted_buildings:
-        for vertex in building.building:
-            minX = min(minX, vertex.x())
-            minY = min(minY, vertex.y())
-            maxX = max(maxX, vertex.x())
-            maxY = max(maxY, vertex.y())
-    print(f"<{minX}, {maxX}><{minY}, {maxY}>")
+
     return painted_buildings

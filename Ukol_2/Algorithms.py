@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QPolygonF
 from PyQt6.QtWidgets import *
-from math import acos, cos, sin, sqrt, inf, atan2
+from math import acos, cos, sin, sqrt, inf, atan2, pi, floor
 from numpy import array, cov
 from numpy.linalg import svd
 from Building import Building
@@ -21,7 +21,21 @@ class Algorithms:
           
         # Show analysis
         messagebox.exec()
+    
+    def analyzePointLinePosition(self, p: QPointF, p1: QPointF, p2: QPointF):
+        ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
+        vx = p.x() - p1.x(); vy = p.y() - p1.y()
         
+        eps = 10e-10
+        # Compute test
+        t = ux*vy - uy*vx
+        
+        # Point in the left halfplane
+        if abs(t) > eps:
+            return 1
+
+        return 0
+      
     def getTwoLineAngle(self, p1 : QPointF, p2 : QPointF, p3 : QPointF, p4 : QPointF) -> float:
         # Get two line angle
         ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
@@ -35,16 +49,15 @@ class Algorithms:
         
         return acos(afi)
     
-    def jarvisScan(self, pol : Building) -> QPolygonF:
+    def jarvisScan(self, pol : QPolygonF) -> QPolygonF:
         # Convex Hull constructed using Jarvis scan
         ch = QPolygonF()
 
         # Find pivot 1
-        polygon = pol.building
-        q = min(polygon,  key = lambda k: k.y())
+        q = min(pol,  key = lambda k: k.y())
         
         # Find pivot 2
-        s = min(polygon,  key = lambda k: k.x())
+        s = min(pol,  key = lambda k: k.x())
         
         # Initialize last 2 points CH        
         qj = q
@@ -59,10 +72,10 @@ class Algorithms:
             omegaMax = 0
             indexMax = -1
             
-            for i in range(len(polygon)):
+            for i in range(len(pol)):
                 
-                if qj != polygon[i]:
-                    omega = self.getTwoLineAngle(qj, qj1, qj, polygon[i])
+                if qj != pol[i]:
+                    omega = self.getTwoLineAngle(qj, qj1, qj, pol[i])
                     
                     # Update maximum
                     if omega > omegaMax:
@@ -70,21 +83,58 @@ class Algorithms:
                         indexMax = i
                     
             # Add new point po convex hull
-            ch.append(polygon[indexMax])
+            ch.append(pol[indexMax])
             
             
             # We found pivot again
-            if polygon[indexMax] == q: 
+            if pol[indexMax] == q: 
                 break
             
             # Update last segment
             qj1 = qj
-            qj = polygon[indexMax]
+            qj = pol[indexMax]
     
         return ch
         
-    def lidaScan(self, pol : QPolygonF) -> QPolygonF:
-        raise NotImplementedError("Method Lída Scan has not been implemented yet")
+    def grahamScan(self, pol : QPolygonF) -> QPolygonF:
+        # CH construction using Graham scan algorithm
+        ch = QPolygonF()
+        
+        # Find pivot
+        q = min(pol, key=lambda k : k.y())
+        
+        # Remove point from QPolygonF
+        tmp = QPolygonF()
+        for point in pol:
+            if q != point:
+                tmp.append(point)
+        pol = tmp
+        
+        # Sort points by angle
+        sorted_points = sorted(pol, key=lambda p: self.getTwoLineAngle(q, QPointF(q.x() - 10, q.y()), q, p), reverse = True)    
+        
+        # Initialize stack, add pivot and first point
+        S = []
+        S.append(q)
+        S.append(sorted_points[0])
+        n = len(pol)
+        
+        # Processing sorted points
+        j= 2
+        while j < len(sorted_points):
+            pj = sorted_points[j]
+            
+            # Add point to the stack            
+            if self.analyzePointLinePosition(pj, S[-2], S[-1]):
+                S.append(pj)
+                j += 1
+            else:
+                S.pop()
+                
+        for point in S:
+            ch.append(point)
+           
+        return ch
     
     def mmb(self, pol : QPolygonF) -> QPolygonF:
         # Compute min_max box
@@ -167,21 +217,18 @@ class Algorithms:
     def slope(self, diagonal : list[QPointF, QPointF]) -> float:
         
         p1 = diagonal[0]; p2 = diagonal[1]
-        p3 = QPointF(0, 0); p4 = QPointF(100, 0)              #x axis
-        if p2.y() < p1.y():
-            tmp = deepcopy(p1)
-            p1 = deepcopy(p2)
-            p2 = deepcopy(tmp)
+        d_x = p2.x() - p1.x()
+        d_y = p2.y() - p1.y()
+        # Find slope angle of longest edge
+        angle = atan2(d_y, d_x)
+    
+        return angle
         
-        sigma = self.getTwoLineAngle(p1, p2, p3, p4)
-            
-        return sigma
-        
-    def resizeRectangle(self, rect : QPolygonF, build : Building) -> QPolygonF:
+    def resizeRectangle(self, rect : QPolygonF, build : QPolygonF) -> QPolygonF:
         # Resize rectangle to fit area of the building
         
         # Compute areas
-        Ab = self.getArea(build.building)
+        Ab = self.getArea(build)
         A = self.getArea(rect)
         
         # Compute ratio
@@ -252,7 +299,7 @@ class Algorithms:
         
         return mmb_res
     
-    def createERPCA(self, pol : Building) -> QPolygonF:
+    def createERPCA(self, pol : QPolygonF) -> QPolygonF:
         # Create enclosing rectangle using PCA
 
         if len(pol) < 3:
@@ -287,12 +334,40 @@ class Algorithms:
         er = self.rotate(mmb, sigma)
         
         # Resize enclosing rectangle
-        er_r = self.resizeRectangle(er, pol)
+        er_r = self.resizeRectangle(er, pol.building)
         
         return er_r
         
     def longestEdge(self, pol : QPolygonF) -> QPolygonF:
-        raise NotImplementedError("Method longest Edge has not been implemented yet")
+        # Create enclosing rectangle using Longest Edge
+        
+        n = len(pol)
+        # Initialize longest edge
+        longest_edge = 0
+        angle = 0
+        
+        # Process all edges
+        for i in range(n):
+            # Get length of the current edge
+            edge_length = self.l2(pol[i], pol[(i + 1)%n])
+            # Find the longest edge of the building
+            if edge_length > longest_edge:
+                longest_edge = edge_length
+                angle = self.slope([pol[i], pol[(i + 1)%n]])
+                
+        # Rotate polygon by -sigma
+        pol_unrot = self.rotate(pol, -angle)
+        
+        # Find min-max box
+        mmb = self.mmb(pol_unrot)
+        
+        # Rotate min-max box
+        er = self.rotate(mmb, angle)
+        
+        # Resize enclosing rectangle 
+        er_r = self.resizeRectangle(er, pol)
+        
+        return er_r
     
     def wallAverage(self, pol : QPolygonF) -> QPolygonF:
         # Create enclosing rectangle using Wall Average
@@ -368,4 +443,45 @@ class Algorithms:
         # rotate min-max box (create emclosing rectangle)
         er = self.rotate(mmb, sigma)
         
-        return er
+        er_res = self.resizeRectangle(er, pol)
+        return er_res
+
+    def validation(self, buildings : list[Building]) -> str:
+        text = f""
+        if not buildings or not buildings[0].building_generalize:
+            return text
+        
+        for building in buildings:
+            sigma1 = 0; sigma2 = 0
+            
+            rect = building.building_generalize
+            slope = 0
+            if self.l2(rect[0], rect[1]) > self.l2(rect[1], rect[2]):
+                slope = self.slope([rect[0], rect[1]])
+            else:
+                slope = self.slope([rect[1], rect[2]])
+            
+            k = (2*slope)/pi
+            r = (k - floor(k))/(pi/2)
+            
+            pol = building.building
+            n = len(pol)
+            for idx in range(n):
+                if pol[idx] == pol[(idx + 1)%n]:
+                    continue
+                
+                slopeEdge = self.slope([pol[idx], pol[(idx + 1)%n]])
+                ki = (2*slopeEdge)/pi
+                ri = (ki - floor(ki))/(pi/2)
+                sigma1 += (ri - r)
+                
+                sigma2 += pow(ri - r, 2)
+            sigma2 = sqrt(sigma2)
+            
+        sigma1 /= n
+        sigma2 /= n
+        
+        sigma1 /= (pi*(2*n))
+        sigma2 /= (pi*(2*n))
+        text = f"Mean angular deviation:\t\t{sigma1:.2f}°\nSquare angular deviation:\t{sigma2:.2f}°"
+        return text

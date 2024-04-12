@@ -180,6 +180,7 @@ class Ui_MainWindow(object):
             return None
         
         self.Canvas.clearData()
+        print(f"Canvas height: {self.Canvas.height()}, canvas width: {self.Canvas.width()}")
         self.Canvas.buildings = load_buildings(filename)
         
     def mbrClick(self):
