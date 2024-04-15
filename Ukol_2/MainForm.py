@@ -94,7 +94,7 @@ class Ui_MainWindow(object):
         self.actionGrahamScan = QtGui.QAction(parent=MainWindow)
         self.actionGrahamScan.setCheckable(True)
         icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap("Images/Lída_scan.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon10.addPixmap(QtGui.QPixmap("Images/Grahamscan.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionGrahamScan.setIcon(icon10)
         self.actionGrahamScan.setObjectName("actionL_da_ob_lka")
         self.actionValidation = QtGui.QAction(parent=MainWindow)
@@ -180,7 +180,6 @@ class Ui_MainWindow(object):
             return None
         
         self.Canvas.clearData()
-        print(f"Canvas height: {self.Canvas.height()}, canvas width: {self.Canvas.width()}")
         self.Canvas.buildings = load_buildings(filename)
         
     def mbrClick(self):

@@ -30,7 +30,7 @@ def load_buildings(path : str) -> list[QPolygonF]:
                 max_y = max(max_y, float(p[1])) 
     
     except FileNotFoundError:
-        errorText = "File has not bee"
+        errorText = "File has not been found."
         return []
     except KeyError:
         errorText = "JSON file has not proper structure."

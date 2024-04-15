@@ -448,6 +448,7 @@ class Algorithms:
 
     def validation(self, buildings : list[Building]) -> str:
         text = f""
+        sigma1sum = 0; sigma2sum = 0
         if not buildings or not buildings[0].building_generalize:
             return text
         
@@ -462,7 +463,7 @@ class Algorithms:
                 slope = self.slope([rect[1], rect[2]])
             
             k = (2*slope)/pi
-            r = (k - floor(k))/(pi/2)
+            r = (k - floor(k))*(pi/2)
             
             pol = building.building
             n = len(pol)
@@ -472,16 +473,20 @@ class Algorithms:
                 
                 slopeEdge = self.slope([pol[idx], pol[(idx + 1)%n]])
                 ki = (2*slopeEdge)/pi
-                ri = (ki - floor(ki))/(pi/2)
+                ri = (ki - floor(ki))*(pi/2)
                 sigma1 += (ri - r)
                 
                 sigma2 += pow(ri - r, 2)
             sigma2 = sqrt(sigma2)
             
-        sigma1 /= n
-        sigma2 /= n
+            sigma1 *= (pi*(2*n))
+            sigma2 *= (pi*(2*n))
+            sigma1sum += sigma1
+            sigma2sum += sigma2
+            
+        sigma1sum /= len(buildings)
+        sigma2sum /= len(buildings)
         
-        sigma1 /= (pi*(2*n))
-        sigma2 /= (pi*(2*n))
-        text = f"Mean angular deviation:\t\t{sigma1:.2f}°\nSquare angular deviation:\t{sigma2:.2f}°"
+        
+        text = f"Mean angular deviation:\t\t{sigma1sum:.2f}°\nSquare angular deviation:\t{sigma2sum:.2f}°"
         return text
