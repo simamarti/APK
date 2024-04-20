@@ -221,7 +221,7 @@ class Algorithms:
         d_y = p2.y() - p1.y()
         # Find slope angle of longest edge
         angle = atan2(d_y, d_x)
-    
+
         return angle
         
     def resizeRectangle(self, rect : QPolygonF, build : QPolygonF) -> QPolygonF:
@@ -341,6 +341,9 @@ class Algorithms:
     def longestEdge(self, pol : QPolygonF) -> QPolygonF:
         # Create enclosing rectangle using Longest Edge
         
+        if len(pol) < 3:
+            return QPolygonF()
+        
         n = len(pol)
         # Initialize longest edge
         longest_edge = 0
@@ -371,7 +374,10 @@ class Algorithms:
     
     def wallAverage(self, pol : QPolygonF) -> QPolygonF:
         # Create enclosing rectangle using Wall Average
+        
         n = len(pol)
+        if n < 3:
+            return QPolygonF()
         
         # Calculate sigma
         d_x = pol[1].x() - pol[0].x()
@@ -449,10 +455,13 @@ class Algorithms:
     def validation(self, buildings : list[Building]) -> str:
         text = f""
         sigma1sum = 0; sigma2sum = 0
+        sigma1Perc = 0; sigma2Perc = 0
+        
         if not buildings or not buildings[0].building_generalize:
+            # No data has been loaded or generalization has not been launched
             return text
         
-        for building in buildings:
+        for building in buildings:          # Iterate through all buildings
             sigma1 = 0; sigma2 = 0
             
             rect = building.building_generalize
@@ -461,7 +470,7 @@ class Algorithms:
                 slope = self.slope([rect[0], rect[1]])
             else:
                 slope = self.slope([rect[1], rect[2]])
-            
+
             k = (2*slope)/pi
             r = (k - floor(k))*(pi/2)
             
@@ -472,21 +481,28 @@ class Algorithms:
                     continue
                 
                 slopeEdge = self.slope([pol[idx], pol[(idx + 1)%n]])
+                
                 ki = (2*slopeEdge)/pi
                 ri = (ki - floor(ki))*(pi/2)
-                sigma1 += (ri - r)
                 
+                sigma1 += (ri - r)
                 sigma2 += pow(ri - r, 2)
+                
             sigma2 = sqrt(sigma2)
             
-            sigma1 *= (pi*(2*n))
-            sigma2 *= (pi*(2*n))
+            sigma1 *= (pi/(2*n)); sigma2 *= (pi/(2*n))
+            sigma1 *= 180/pi; sigma2 *= 180/pi
+            
+            if abs(sigma1) < 10: sigma1Perc += 1
+            if abs(sigma2) < 10: sigma2Perc += 1
+            
             sigma1sum += sigma1
             sigma2sum += sigma2
             
-        sigma1sum /= len(buildings)
-        sigma2sum /= len(buildings)
-        
-        
-        text = f"Mean angular deviation:\t\t{sigma1sum:.2f}°\nSquare angular deviation:\t{sigma2sum:.2f}°"
+        sigma1sum /= len(buildings); sigma2sum /= len(buildings)
+        sigma1Perc /= len(buildings); sigma2Perc /= len(buildings)
+
+        text = f"Mean angular deviation:\t\t{sigma1sum:.2f}°\nSquare angular deviation:\t{sigma2sum:.2f}°\n"
+        text += f"Percentage of buildings which met the condition (|\u03C3|<10°):\n"
+        text += f"\tAngular deviation:\t\t{sigma1Perc*100:.2f} %\n\tSquare angular deviation:\t{sigma2Perc*100:.2f} %"
         return text

@@ -30,21 +30,6 @@ class Draw(QWidget):
         for building in self.buildings:
             building.building_generalize = QPolygonF()
         
-    def mousePressEvent(self, e: QMouseEvent):
-        
-        # Get Coordinates
-        x = e.position().x()
-        y = e.position().y()
-        
-        # Add vertex
-        p = QPointF(x, y)
-                
-        # Add point to building
-        # self.building.append(p)
-        
-        # Repaint screen
-        self.repaint()
-        
     def paintEvent(self, e: QPaintEvent):
         # Draw situation
         
