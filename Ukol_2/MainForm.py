@@ -199,7 +199,7 @@ class Ui_MainWindow(object):
         for building in buildings:
             
             #Simplify building
-            simplify = a.createMBR(building.building, convexFunction)
+            simplify = a.createMBR(building.getBuilding(), convexFunction)
             
             # Save generalize building
             building.setBuildingGeneralize(simplify)     
@@ -217,7 +217,7 @@ class Ui_MainWindow(object):
         
         for building in buildings:
             # Simplify building
-            pca = a.createERPCA(building)
+            pca = a.createERPCA(building.getBuilding())
             
             # Update Generalize Building
             building.setBuildingGeneralize(pca)    
@@ -258,7 +258,7 @@ class Ui_MainWindow(object):
         
         for building in buildings:
             #Simplify building
-            simplify = a.longestEdge(building.building)      
+            simplify = a.longestEdge(building.getBuilding())      
                   
             #Update Generalize Building
             building.setBuildingGeneralize(simplify)
@@ -275,7 +275,7 @@ class Ui_MainWindow(object):
         
         for building in buildings:
             #Simplify building
-            simplify = a.wallAverage(building.building)      
+            simplify = a.wallAverage(building.getBuilding())      
             
             #Update Generalize Building
             building.setBuildingGeneralize(simplify)
@@ -292,7 +292,7 @@ class Ui_MainWindow(object):
         
         for building in buildings:
             #Simplify building
-            maer = a.weightedBisector(building.building)
+            maer = a.weightedBisector(building.getBuilding())
             
             #Update Generalize Building
             building.setBuildingGeneralize(maer)    
@@ -304,7 +304,7 @@ class Ui_MainWindow(object):
         """Validation of the method"""
         alg = Algorithms()
         
-        text = alg.validation(self.Canvas.buildings)
+        text = alg.validation(self.Canvas.getBuildings())
         if text == "":
             return
         

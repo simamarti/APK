@@ -124,7 +124,7 @@ class Algorithms:
         t = ux*vy - uy*vx
         
         # Point in the left halfplane
-        if t < -eps:
+        if t > eps:
             return True
 
         return False
@@ -577,7 +577,7 @@ class Algorithms:
         x = []; y = []
         
         # Add coordinates to lists
-        for point in pol.building:
+        for point in pol:
             x.append(point.x())
             y.append(point.y())
         
@@ -594,7 +594,7 @@ class Algorithms:
         sigma = atan2(U[0][1], U[0][0])
         
         # Rotate polygon by minus sigma
-        pol_unrot = self.rotate(pol.building, -sigma)
+        pol_unrot = self.rotate(pol, -sigma)
         
         # Find min-max box
         mmb = self.mmb(pol_unrot)
@@ -603,7 +603,7 @@ class Algorithms:
         er = self.rotate(mmb, sigma)
         
         # Resize enclosing rectangle
-        er_r = self.resizeRectangle(er, pol.building)
+        er_r = self.resizeRectangle(er, pol)
         
         return er_r
         
