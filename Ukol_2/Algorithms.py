@@ -124,7 +124,7 @@ class Algorithms:
         t = ux*vy - uy*vx
         
         # Point in the left halfplane
-        if abs(t) > eps:
+        if t < -eps:
             return True
 
         return False
