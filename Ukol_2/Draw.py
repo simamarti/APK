@@ -6,41 +6,64 @@ from PyQt6.QtWidgets import *
 from Building import Building
 
 class Draw(QWidget):
+    """ A class for drawing
+    
+    Attributes
+    ----------
+    self.buildings : list[Building]
+        list of buildings (object of class Building)
+    self.jarvis : bool
+        True - Jarvis Scan is used for construct Convex Hull, otherwise Graham Scan is used
+    
+    Methods
+    -------
+    getBuldings():
+        Getter for access to buildings
+        
+    setJarvis():
+        Choose method for creating Convex Hull
+    
+    cleardata()
+        Clear all data
+        
+    clearmbr()
+        Clear generalized buildings
+    
+    paintEvent(e)
+        Method for redraw Canvas
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # self.building = QPolygonF([QPointF(100, 100), QPointF(100, 200), QPointF(200, 150)])
         self.buildings : list[Building] = []
-        
         self.jarvis = True
        
     def getBuildings(self) -> list:
-        # Return analyzed polygons
+        """Getter for access to buildings"""
         return self.buildings
        
     def setJarvis(self):
+        """Choose method for creating Convex Hull"""
         self.jarvis = not self.jarvis
          
     def clearData(self):
-        # Clear building
+        """Clear all data"""
+        
         self.buildings = []
         
     def clearmbr(self):
+        """Clear generalized buildings"""
         
         for building in self.buildings:
-            building.building_generalize = QPolygonF()
+            building.setBuildingGeneralize(QPolygonF())
         
     def paintEvent(self, e: QPaintEvent):
-        # Draw situation
+        """Method for redraw Canvas"""
         
         # Create new draphic object
         qp = QPainter(self)
         
         # Start drawing
-        qp.begin(self)
-        
-        # Set atributes
-        
+        qp.begin(self)        
         
         # Draw buildings
         for building in self.buildings:
@@ -48,23 +71,14 @@ class Draw(QWidget):
             qp.setPen(Qt.GlobalColor.black)
             qp.setBrush(Qt.GlobalColor.yellow)
             
-            qp.drawPolygon(building.building)
+            qp.drawPolygon(building.getBuilding())
     
             # Set atributes for simplified building
             qp.setPen(Qt.GlobalColor.red)
             qp.setBrush(Qt.GlobalColor.transparent)
             
-            # Draw mbr
-            qp.drawPolygon(building.building_generalize)
-        
-        # Set graphical atributes for ch
-        # Draw convex hull
-        
-        # Set graphical atributes for mbr
-        # Draw Minimum bounding rectangle
-        
-        # Draw point
-        qp.setPen(Qt.GlobalColor.blue)
+            # Draw generalized building
+            qp.drawPolygon(building.getBuildingGeneralize())
         
         # End drawing
         qp.end()

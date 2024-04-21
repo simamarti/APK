@@ -5,15 +5,30 @@ from math import inf
 from Building import Building
 from PyQt6 import QtWidgets
 
-def load_buildings(path : str) -> list[QPolygonF]:
+def load_buildings(path : str) -> list[Building]:
+    """Load from file and transform polygons to new coordinates which are compatible with canvas coordinates
+        
+        Parameters
+        ----------
+        path : str
+            relative/absolute path to the file with coordinates of buildings
+            
+        Returns
+        -------
+        painted polygons : list[Building]
+            list of buildings with transformed coordinates
+    """
+    
     errorText = ""
-    try:
+    try:                
+        # Avoid falling of the program due to the problems with working with IO stream
         with open(path, 'r', encoding = 'utf-8') as f:
             file = json.load(f)
     
             
         polygons = file['POLYGONS']
         
+        # Initilate scaling factor, shift and min/max of coordinates
         dx = 0; dy = 0; scale = 0
         min_x = inf; max_x = -inf; min_y = inf; max_y = -inf 
         
@@ -46,6 +61,7 @@ def load_buildings(path : str) -> list[QPolygonF]:
         return []
         
     finally:   
+        # After try block in the case of error arise message box with error
         if errorText != "":
             messagebox = QtWidgets.QMessageBox()
             messagebox.setWindowTitle(errorText)
@@ -60,10 +76,7 @@ def load_buildings(path : str) -> list[QPolygonF]:
     scale = 0
     # Compute shifts and scalling factor
     dx = (max_x + min_x)/2; dy = (max_y + min_y)/2
-    if abs(max_x - min_x)/(width - offset) > abs(max_y - min_y)/(height - offset):
-        scale = max(1, abs(max_x - min_x)/(width - offset))
-    else:
-        scale = max(1, abs(max_y - min_y)/(height - offset))    
+    scale = max(1, abs(max_y - min_y)/(height - offset), abs(max_x - min_x)/(width - offset))  
 
     # transform coordinates
     painted_polygons = transformBuildings(polygons, scale, dx, dy, width, height, offset)
@@ -75,7 +88,7 @@ def transformBuildings(buildings : list[dict], scale : float, dx : float, dy : f
         
         Parameters
         ----------
-        polygons : list[dict]
+        buildings : list[dict]
             list of dictionaries with points
         scale : float
             scale factor for transformation
@@ -92,25 +105,29 @@ def transformBuildings(buildings : list[dict], scale : float, dx : float, dy : f
             
         Returns
         -------
-        painted polygons : list[Polygon]
-            list of polygons with transformed coordinates
+        painted polygons : list[Building]
+            list of buildings with transformed coordinates
     """
     painted_buildings = []    
     
+    # Iterate through all buildings
     for region in buildings:
         pol = Building()
         points = region['POINTS']
         if len(points) < 3:
             continue
         
+        #Iterate through all points in building
         for point in points:
             if point[0] == 'N' or point[1] == 'N' or point[0] == 'P' or point[1] == 'P':
                 continue
             
+            # Scale and move original coordinates
             new_x = (float(point[0]) - dx)/scale + width/2
-            new_y = (-1)*((float(point[1]) - dy)/scale + height/2) + height - offset
-            point = QPointF(new_x, new_y)
-            pol.addVertex(point)
+            new_y = (-1)*((float(point[1]) - dy)/scale + height/2) + height - offset # In Qt origin of the coordianate system is on the upper left corner
+            
+            point = QPointF(new_x, new_y)   
+            pol.addVertex(point)            # Save new point in building
         painted_buildings.append(pol)
 
     return painted_buildings

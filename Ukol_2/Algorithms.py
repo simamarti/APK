@@ -7,14 +7,88 @@ from math import acos, cos, sin, sqrt, inf, atan2, pi, floor
 from numpy import array, cov
 from numpy.linalg import svd
 from Building import Building
-from copy import deepcopy
 
 class Algorithms:
+    """ A class to algorithms
     
+    Attributes
+    ----------
+    None
+    
+    Methods
+    -------
+    errorWindow(text):
+        Error Window will be arised if error occurs
+
+    analyzePointLinePosition(p, p1, p2):
+        Analyze position of point and line
+        
+    getTwoLineAngle(p1, p2, p3, p4):
+        Compute angle between two lines
+        
+    jarvisScan(pol):
+        Jarvis Scan
+        
+    grahamScan(pol):
+        Graham Scan
+        
+    mmb(pol):
+        Compute min-max box for building
+
+    rotate(pol, sig):
+        Rotate building
+        
+    getArea(pol):
+        Compute area of the building
+        
+    l2(p1, p2):
+        Euclidian distance
+        
+    searchDiagonals(pol):
+        Searching two longest diagonals
+        
+    weightedMean(sigma1, d1, sigma2, d2):
+        Weighted mean
+        
+    slope(diagonal):
+        Compute slope of the line
+        
+    resizeRectangle(rect, build):
+        Resize rectangle to fit area of the building
+
+    createMBR(pol, convexHull):
+        Create minimum bounding rectangle
+        
+    createERPCA(pol):
+        Create enclosing rectangle using PCA
+        
+    longestEdge(pol):
+        Create enclosing rectangle using Longest Edge
+        
+    wallAverage(pol):
+        Create enclosing rectangle using Wall Average
+        
+    weightedBisector(pol):
+        Create enclosing rectangle using Weighted Bisector
+        
+    validation(buildings):
+        Create enclosing rectangle using Weighted Bisector
+    """
     def __init__(self):
         pass
     
     def errorWindow(self, text : str) -> None:
+        """Error Window will be arised if error occurs
+        
+        Parameters
+        ----------
+        text : str
+            Text for showing
+        
+        Returns
+        -------
+        None
+        """
         messagebox = QtWidgets.QMessageBox()
         messagebox.setWindowTitle(text)
         messagebox.setText("Polygon contains less than 3 points. " + text + " cannot be created")
@@ -22,7 +96,26 @@ class Algorithms:
         # Show analysis
         messagebox.exec()
     
-    def analyzePointLinePosition(self, p: QPointF, p1: QPointF, p2: QPointF):
+    def analyzePointLinePosition(self, p: QPointF, p1: QPointF, p2: QPointF) -> bool:
+        """Analyze position of point and line
+        
+        Parameters
+        ----------
+        p : QPointF
+            Analyze point
+            
+        p1 : QPointF
+            Starting point of line
+            
+        p2 : QPointF
+            Ending point of line
+        
+        Returns
+        -------
+        True: Point is in the left-halfplane
+        False: Poin is not in the left-halfplane
+        """
+        # Compute vectors
         ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
         vx = p.x() - p1.x(); vy = p.y() - p1.y()
         
@@ -32,11 +125,31 @@ class Algorithms:
         
         # Point in the left halfplane
         if abs(t) > eps:
-            return 1
+            return True
 
-        return 0
+        return False
       
     def getTwoLineAngle(self, p1 : QPointF, p2 : QPointF, p3 : QPointF, p4 : QPointF) -> float:
+        """Compute angle between two lines
+        
+        Parameters
+        ----------
+        p1 : QPointF
+            Starting point of first line
+            
+        p2 : QPointF
+            Ending point of first line
+        
+        p3 : QPointF
+            Starting point of second line
+            
+        p4 : QPointF
+            Ending point of second line
+            
+        Returns
+        -------
+        angle between lines
+        """
         # Get two line angle
         ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
         vx = p4.x() - p3.x(); vy = p4.y() - p3.y()
@@ -50,6 +163,18 @@ class Algorithms:
         return acos(afi)
     
     def jarvisScan(self, pol : QPolygonF) -> QPolygonF:
+        """Jarvis Scan
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+            
+        Returns
+        -------
+        ch : QPolygonF
+            Convex Hull
+        """
         # Convex Hull constructed using Jarvis scan
         ch = QPolygonF()
 
@@ -97,6 +222,18 @@ class Algorithms:
         return ch
         
     def grahamScan(self, pol : QPolygonF) -> QPolygonF:
+        """Graham Scan
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+            
+        Returns
+        -------
+        ch : QPolygonF
+            Convex Hull
+        """
         # CH construction using Graham scan algorithm
         ch = QPolygonF()
         
@@ -137,6 +274,18 @@ class Algorithms:
         return ch
     
     def mmb(self, pol : QPolygonF) -> QPolygonF:
+        """Compute min-max box for building
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+            
+        Returns
+        -------
+        box : QPolygonF
+            min-max box
+        """
         # Compute min_max box
         
         # Compute points with extreme coordinates
@@ -155,6 +304,21 @@ class Algorithms:
         return box
         
     def rotate(self, pol : QPolygonF, sig : float) -> QPolygonF:
+        """Rotate building
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+        
+        sig : float
+            angle for rotating
+            
+        Returns
+        -------
+        polr : QPolygonF
+            Rotated polygon
+        """
         # Rotate polygon by given angle
         
         polr = QPolygonF()
@@ -173,8 +337,18 @@ class Algorithms:
             
         return polr
     
-    def getArea(sell, pol : QPolygonF) -> float:
-        # Return polygon area
+    def getArea(self, pol : QPolygonF) -> float:
+        """Compute area of the building
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+          
+        Returns
+        -------
+        Area of the building
+        """
         # polygon length
         n = len(pol)
         suma = 0
@@ -186,12 +360,38 @@ class Algorithms:
         return abs(suma)/2
     
     def l2(self, p1 : QPointF, p2 : QPointF) -> float:
-        # Euclidian distance
+        """Euclidian distance
+        
+        Parameters
+        ----------
+        p1 : QPointF
+            First point
+        
+        p2 : QPointF
+            Second point
+            
+        Returns
+        -------
+        Euclidian distance between points
+        """
         
         return sqrt((p1.x() - p2.x())**2 + (p1.y() - p2.y())**2)
         
-    def searchDiagonals(self, pol: QPolygonF):
+    def searchDiagonals(self, pol: QPolygonF) -> tuple:
+        """Searching two longest diagonals
         
+        Parameters
+        ----------
+        pol : QPolygonF
+            Building
+        
+        Returns
+        -------
+        First - Longest diagonal
+        d1 - length of longest diagonal
+        Second - second longest diagonal
+        d2 - length of second longest diagonal
+        """
         first = [pol[0], pol[1]]; d1 = self.l2(pol[0], pol[1])
         second = [pol[0], pol[2]]; d2 = self.l2(pol[0], pol[2])
         n = len(pol)
@@ -209,13 +409,43 @@ class Algorithms:
         return first, d1, second, d2
     
     def weightedMean(self, sigma1 : float, d1 : float, sigma2 : float, d2 : float) -> float:
+        """Weighted mean
+        
+        Parameters
+        ----------
+        sigma1 : float
+            slope of first diagonal
+        
+        d1 : float
+            lenght of first diagonal
+            
+        sigma2 : float
+            slope of second diagonal
+        
+        d2 : float
+            lenght of second diagonal
+            
+        Returns
+        -------
+        Weighted mean of angles
+        """
         nom = sigma1*d1 + sigma2*d2
         denom = d1 + d2
         
         return nom/denom
     
-    def slope(self, diagonal : list[QPointF, QPointF]) -> float:
+    def slope(self, diagonal : list[QPointF]) -> float:
+        """Compute slope of the line
         
+        Parameters
+        ----------
+        diagonal : list[QPointF]
+            diagonal
+            
+        Returns
+        -------
+        angle - slope of the diagonal
+        """
         p1 = diagonal[0]; p2 = diagonal[1]
         d_x = p2.x() - p1.x()
         d_y = p2.y() - p1.y()
@@ -225,7 +455,21 @@ class Algorithms:
         return angle
         
     def resizeRectangle(self, rect : QPolygonF, build : QPolygonF) -> QPolygonF:
-        # Resize rectangle to fit area of the building
+        """Resize rectangle to fit area of the building
+        
+        Parameters
+        ----------
+        rect : QPolygonF
+            generalized building (rectangle)
+        
+        build : QPolygonF
+            original buildong
+            
+        Returns
+        -------
+        recR : QPolygonF
+            resized generalized building
+        """
         
         # Compute areas
         Ab = self.getArea(build)
@@ -256,7 +500,21 @@ class Algorithms:
         return rectR
     
     def createMBR(self, pol : QPolygonF, convexHull) -> QPolygonF:
-        # Create minimum bounding rectangle
+        """Create minimum bounding rectangle
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            building
+        
+        convexHull : function
+            method for creating Convex Hull (Jarvis Scan, Graham Scan)
+            
+        Returns
+        -------
+        mmb_res : QPolygonF
+            generalized building
+        """
         
         if len(pol) < 3:
             return QPolygonF()
@@ -300,7 +558,18 @@ class Algorithms:
         return mmb_res
     
     def createERPCA(self, pol : QPolygonF) -> QPolygonF:
-        # Create enclosing rectangle using PCA
+        """Create enclosing rectangle using PCA
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            building
+            
+        Returns
+        -------
+        er_r : QPolygonF
+            generalized building
+        """
 
         if len(pol) < 3:
             return QPolygonF()
@@ -339,7 +608,18 @@ class Algorithms:
         return er_r
         
     def longestEdge(self, pol : QPolygonF) -> QPolygonF:
-        # Create enclosing rectangle using Longest Edge
+        """Create enclosing rectangle using Longest Edge
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            building
+            
+        Returns
+        -------
+        er_r : QPolygonF
+            generalized building
+        """
         
         if len(pol) < 3:
             return QPolygonF()
@@ -373,7 +653,18 @@ class Algorithms:
         return er_r
     
     def wallAverage(self, pol : QPolygonF) -> QPolygonF:
-        # Create enclosing rectangle using Wall Average
+        """Create enclosing rectangle using Wall Average
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            building
+            
+        Returns
+        -------
+        er_r : QPolygonF
+            generalized building
+        """
         
         n = len(pol)
         if n < 3:
@@ -426,7 +717,19 @@ class Algorithms:
         return er_r
 
     def weightedBisector(self, pol : QPolygonF) -> QPolygonF:
-    
+        """Create enclosing rectangle using Weighted Bisector
+        
+        Parameters
+        ----------
+        pol : QPolygonF
+            building
+            
+        Returns
+        -------
+        er_res : QPolygonF
+            generalized building
+        """
+        
         if len(pol) < 3:
             return QPolygonF()
         
@@ -453,18 +756,32 @@ class Algorithms:
         return er_res
 
     def validation(self, buildings : list[Building]) -> str:
+        """Create enclosing rectangle using Weighted Bisector
+        
+        Parameters
+        ----------
+        buildings : list[Building]
+            list of buildings
+            
+        Returns
+        -------
+        text : str
+            text with results
+        """
         text = f""
         sigma1sum = 0; sigma2sum = 0
         sigma1Perc = 0; sigma2Perc = 0
         
-        if not buildings or not buildings[0].building_generalize:
-            # No data has been loaded or generalization has not been launched
+        # No data has been loaded or generalization has not been launched
+        if not buildings or not buildings[0].getBuildingGeneralize():
             return text
         
-        for building in buildings:          # Iterate through all buildings
+        # Iterate through all buildings
+        for building in buildings:          
             sigma1 = 0; sigma2 = 0
             
-            rect = building.building_generalize
+            # Compute r and k for generalized building
+            rect = building.getBuildingGeneralize()
             slope = 0
             if self.l2(rect[0], rect[1]) > self.l2(rect[1], rect[2]):
                 slope = self.slope([rect[0], rect[1]])
@@ -474,7 +791,9 @@ class Algorithms:
             k = (2*slope)/pi
             r = (k - floor(k))*(pi/2)
             
-            pol = building.building
+            pol = building.getBuilding()
+            
+            # Iterate through each building
             n = len(pol)
             for idx in range(n):
                 if pol[idx] == pol[(idx + 1)%n]:
@@ -493,6 +812,7 @@ class Algorithms:
             sigma1 *= (pi/(2*n)); sigma2 *= (pi/(2*n))
             sigma1 *= 180/pi; sigma2 *= 180/pi
             
+            # Condition for acceptance
             if abs(sigma1) < 10: sigma1Perc += 1
             if abs(sigma2) < 10: sigma2Perc += 1
             
@@ -502,6 +822,7 @@ class Algorithms:
         sigma1sum /= len(buildings); sigma2sum /= len(buildings)
         sigma1Perc /= len(buildings); sigma2Perc /= len(buildings)
 
+        # Generating text result
         text = f"Mean angular deviation:\t\t{sigma1sum:.2f}°\nSquare angular deviation:\t{sigma2sum:.2f}°\n"
         text += f"Percentage of buildings which met the condition (|\u03C3|<10°):\n"
         text += f"\tAngular deviation:\t\t{sigma1Perc*100:.2f} %\n\tSquare angular deviation:\t{sigma2Perc*100:.2f} %"

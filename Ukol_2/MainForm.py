@@ -183,65 +183,74 @@ class Ui_MainWindow(object):
         self.Canvas.buildings = load_buildings(filename)
         
     def mbrClick(self):
-        
+        """Calculate minimum bounding rectangle using convex hull"""
         a = Algorithms()
-        #Get building
+        
+        # Get building
         buildings = self.Canvas.getBuildings()
         
+        # Choose method for construct convwx hull (Jarvis Scan / Graham Scan)        
+        if self.Canvas.jarvis:
+            convexFunction = a.jarvisScan
+        else:
+            convexFunction = a.grahamScan
+        
+        # Iterate through buildings
         for building in buildings:
-            #Simplify building
-            simplify = None
-            if self.Canvas.jarvis:
-                simplify = a.createMBR(building.building, a.jarvisScan)
-            else:
-                simplify = a.createMBR(building.building, a.grahamScan)
             
+            #Simplify building
+            simplify = a.createMBR(building.building, convexFunction)
+            
+            # Save generalize building
             building.setBuildingGeneralize(simplify)     
         
         #Repaint screen
         self.Canvas.repaint()
         
     def pcaClick(self):
-        
+        """Calculate minimum bounding rectangle using PCA"""
         a = Algorithms()
         
-        #Get building
+        # Get building
         buildings = self.Canvas.getBuildings()
         
-        #Simplify building
         
         for building in buildings:
-            #Simplify building
+            # Simplify building
             pca = a.createERPCA(building)
             
-            #Update Generalize Building
+            # Update Generalize Building
             building.setBuildingGeneralize(pca)    
             
-        #Repaint screen
+        # Repaint screen
         self.Canvas.repaint()
     
     def clearClick(self):
+        """Clear generalize buildings"""
         self.Canvas.clearmbr()
     
         #Repaint screen
         self.Canvas.repaint()
         
     def clearAllClick(self):
+        """Clear Canvas, all data"""
         self.Canvas.clearData()
         
         #Repaint screen
         self.Canvas.repaint()
     
     def jarvisScan(self):
+        """Check Jarvis Scan and uncheck Graham Scan"""
         self.Canvas.jarvis = True
         self.actionGrahamScan.setChecked(False)
     
     def grahamScan(self):
+        """Check Graham Scan and uncheck Jarvis Scan"""
         self.Canvas.jarvis = False
         self.actionJarvis_Scan.setChecked(False)
     
     def longestEdge(self):
-        
+        """Generalize buildings using Longest Edge method"""
         a = Algorithms()
 
         #Get building
@@ -252,13 +261,13 @@ class Ui_MainWindow(object):
             simplify = a.longestEdge(building.building)      
                   
             #Update Generalize Building
-            building.building_generalize = simplify
+            building.setBuildingGeneralize(simplify)
         
         #Repaint screen
         self.Canvas.repaint()
     
     def wallAverage(self):
-        
+        """Generalize buildings using Wall Average method"""
         a = Algorithms()
         
         #Get building
@@ -269,13 +278,13 @@ class Ui_MainWindow(object):
             simplify = a.wallAverage(building.building)      
             
             #Update Generalize Building
-            building.building_generalize = simplify
+            building.setBuildingGeneralize(simplify)
         
         #Repaint screen
         self.Canvas.repaint()
     
     def weightedBisector(self):
-        
+        """Generalize buildings using Weighted Bisector method"""
         a = Algorithms()
         
         #Get buildings
@@ -292,11 +301,14 @@ class Ui_MainWindow(object):
         self.Canvas.repaint()
 
     def validation(self):
+        """Validation of the method"""
         alg = Algorithms()
         
         text = alg.validation(self.Canvas.buildings)
         if text == "":
             return
+        
+        # Arise message box with results
         messagebox = QtWidgets.QMessageBox()
         messagebox.setWindowTitle("Validation")
         messagebox.setText(text)
