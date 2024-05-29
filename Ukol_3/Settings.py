@@ -10,6 +10,8 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Settings(object):
+    """Class represents Dialog window for setting parameters for creating Contour Lines"""
+
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
         Settings.resize(296, 214)

@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         self.settings = QtWidgets.QDialog()
         self.ui = Ui_Settings()
         self.ui.setupUi(self.settings)
-        
+
         self.retranslateUi(MainWindow)
         self.actionOpen.triggered.connect(self.openClick) # type: ignore
         self.actionCreate_DTM.triggered.connect(self.createDTMClick) # type: ignore
@@ -153,10 +153,10 @@ class Ui_MainWindow(object):
         self.actionContour_line.triggered.connect(self.viewContourLineClick)
         self.actionSlope.triggered.connect(self.viewSlopeClick)
         self.actionCreate_contour_lines.triggered.connect(self.createContourLinesClick)
-        
-        
+
+
         self.actionClose.triggered.connect(MainWindow.close) # type: ignore
-        
+
         self.actionParameters.triggered.connect(self.setParameters) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -165,198 +165,218 @@ class Ui_MainWindow(object):
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(caption="Open File", directory="Data/.", filter="JSON file (*.json; *.geojson)")
         if filename == "":
             return None
-        
+
         self.Canvas.clearAll()
         self.Canvas.points, self.Canvas.border = loadPoints(filename)
-      
+        print(len(self.Canvas.points))
+
     def createDTMClick(self):
+        """Create Delaunay triangulation on click"""
+
         # Get points
         points = self.Canvas.getPoints()
-        
+
         # Points has not been loaded yet
         if len(points) == 0:
             return None
-        
+
         # Create triangulation
         alg = Algorithms()
         dt = alg.createDT(points)
-        
+
         # Clip dt by border
         dt = alg.clipDt(dt, self.Canvas.getBorder())
-        
+
         # Upadate DT
         self.Canvas.setDT(dt)
-        
+
         # Repaint screen
         self.Canvas.repaint()
-    
+
         # Check menu item
         self.actionDTM.setChecked(True)
-        
+
     def createContourLinesClick(self):
+        """Create Contour Lines on click"""
+
         # Get Delaunay triangulation
         alg = Algorithms()
 
         # Do we have a triangulation
         dt = self.Canvas.getDT()
-        
+
         # No triangulation constructed
         if not dt:
             # Get points
             points = self.Canvas.getPoints()
-            
+
             # Points has not been loaded yet
             if len(points) == 0:
                 return None
-        
+
             # Create DT
             dt = alg.createDT(points)
-            
+
             # Clip dt by border
             dt = alg.clipDt(dt, self.Canvas.getBorder())
-        
+
             # Set results
             self.Canvas.setDT(dt)
-                
-        # Get contour lines parameters
+
+        # Get contour lines parameters from dialog window
         zmin = float(self.ui.minVal.text())
         zmax = float(self.ui.maxVal.text())
         dz = float(self.ui.intVal.text())
 
         # Create contour lines
         contours = alg.createContourLines(dz, zmin, zmax, self.Canvas.getDT())
-        
+
         # Set results
         self.Canvas.setContours(contours)
-        
+
         # Repaint screen
         self.Canvas.repaint()
-        
+
         # Check menu item
         self.actionContour_line.setChecked(True)
-        
+
     def analyzeSlopeClick(self):
+        """Analyze slope on click"""
+
         # Get Delaunay triangulation
         alg = Algorithms()
 
         # Do we have a triangulation
         dt = self.Canvas.getDT()
-        
+
         # No triangulation constructed
         if not dt:
             # Get points
             points = self.Canvas.getPoints()
-            
+
             # Points has not been loaded yet
             if len(points) == 0:
                 return None
-            
+
             # Create DT
             dt = alg.createDT(points)
-            
+
             # Clip dt by border
             dt = alg.clipDt(dt, self.Canvas.getBorder())
-        
+
             # Set results
             self.Canvas.setDT(dt)
-            
+
         # Analyze dtm slope
         slope = alg.analyzeDTMSlope(self.Canvas.getDT())
-        
+
         # Set results
         self.Canvas.setDTMSlope(slope)
-        
+
         # Repaint screen
         self.Canvas.repaint()
-    
+
         # Check menu item
         self.actionSlope.setChecked(True)
-        
+
     def analyzeAspectClick(self):
+        """Create Aspect on click"""
+
         # Get Delaunay triangulation
         alg = Algorithms()
 
         # Do we have a triangulation
         dt = self.Canvas.getDT()
-        
+
         # No triangulation constructed
         if not dt:
             # Get points
             points = self.Canvas.getPoints()
-            
+
             # Points has not been loaded yet
             if len(points) == 0:
                 return None
-        
+
             # Create DT
             dt = alg.createDT(points)
-            
+
             # Clip dt by border
             dt = alg.clipDt(dt, self.Canvas.getBorder())
-        
+
             # Set results
             self.Canvas.setDT(dt)
-            
+
         # Analyze dtm aspect
         aspect = alg.analyzeDTMAspect(self.Canvas.getDT())
-        
+
         # Set results
         self.Canvas.setDTMAspect(aspect)
-        
+
         # Repaint screen
         self.Canvas.repaint()
-    
+
         # Check menu item
         self.actionExposition.setChecked(True)
-    
+
     def clearClick(self):
+        """Clear analysis"""
+
         # Clear results
         self.Canvas.clearResults()
-        
+
         # Repaint screen
         self.Canvas.repaint()
-    
+
     def clearAllClick(self):
+        """Clear all"""
+
         # Clear all data
         self.Canvas.clearAll()
-        
+
         # Repaint screeen
         self.Canvas.repaint()
-    
+
     def viewDTMClick(self):
+        """Change visibility of Delaunay triangulation"""
+
         # Enable/disable DTM
         self.Canvas.setViewDT(self.actionDTM.isChecked())
-        
+
         # Upadate
         self.Canvas.update()
-    
+
     def viewContourLineClick(self):
+        """Change visibility of Contour Lines"""
+
         # Enable/disable Contour lines
         self.Canvas.setViewContourLine(self.actionContour_line.isChecked())
-        
+
         # Upadate
         self.Canvas.update()
-    
+
     def viewSlopeClick(self):
+        """Change visibility of Slope"""
+
         # Enable/disable Slope
         self.Canvas.setViewSlope(self.actionSlope.isChecked())
-        
+
         # Upadate
         self.Canvas.update()
-    
+
     def viewExpositionClick(self):
+        """Change visibility of Exposition"""
+
         # Enable/disable Exposition
         self.Canvas.setViewAspect(self.actionExposition.isChecked())
 
         # Upadate
         self.Canvas.update()
-    
+
     def setParameters(self):
+        """Set parameters for creating Contour Lines using Dialog window"""
+
         self.settings.show()
-    
-    def setColors(self):
-        self.color.show()
-        
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "DTM Analysis"))
@@ -364,7 +384,6 @@ class Ui_MainWindow(object):
         self.menuAnalysis.setTitle(_translate("MainWindow", "Analysis"))
         self.menuView.setTitle(_translate("MainWindow", "View"))
         self.menuClear.setTitle(_translate("MainWindow", "Clear"))
-        self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
@@ -378,8 +397,6 @@ class Ui_MainWindow(object):
         self.actionExposition.setText(_translate("MainWindow", "Exposition"))
         self.actionClear_results.setText(_translate("MainWindow", "Clear results"))
         self.actionClear_all.setText(_translate("MainWindow", "Clear all"))
-        self.actionParameters.setText(_translate("MainWindow", "Parameters"))
-        self.actionParameters.setToolTip(_translate("MainWindow", "Parameters settings"))
 from Draw import Draw 
 
 

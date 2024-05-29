@@ -1,6 +1,4 @@
-from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QPolygonF
 
 class QPoint3DF(QPointF):
     def __init__(self, x : float, y : float, z : float) -> None:
@@ -8,7 +6,11 @@ class QPoint3DF(QPointF):
         self.z = z
         
     def __eq__(self, other) -> bool:
+        """Overloaded equal operator"""
+
         return (self.x() == other.x() and self.y() == other.y() and self.getZ() == other.getZ())
-    
+
     def getZ(self):
+        """Getter for z coordinates"""
+        
         return self.z
