@@ -122,6 +122,7 @@ def transformPoints(points : list[list], scale : float, dx : float, dy : float, 
             list of points with transformed coordinates
     """
     painted_points = []    
+
     for point in points:
 
         if qpoint3df:
@@ -132,7 +133,7 @@ def transformPoints(points : list[list], scale : float, dx : float, dy : float, 
         # Check if string is float (e. g. -0.123)
         if not isNumber(x) or not isNumber(y) or not isNumber(z):
             continue
-
+            
         # Transform coordinates
         new_x = (float(x) - dx)/scale + width/2
         new_y = (-1)*((float(y) - dy)/scale + height/2) + height - offset

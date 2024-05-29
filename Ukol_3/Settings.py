@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'settings.ui'
+# Form implementation generated from reading ui file 'Settings.ui'
 #
 # Created by: PyQt6 UI code generator 6.6.1
 #
@@ -10,8 +10,6 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Settings(object):
-    """Class represents Dialog window for setting parameters for creating Contour Lines"""
-
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
         Settings.resize(296, 214)

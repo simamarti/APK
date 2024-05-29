@@ -168,7 +168,6 @@ class Ui_MainWindow(object):
 
         self.Canvas.clearAll()
         self.Canvas.points, self.Canvas.border = loadPoints(filename)
-        print(len(self.Canvas.points))
 
     def createDTMClick(self):
         """Create Delaunay triangulation on click"""
