@@ -10,78 +10,6 @@ from random import random
 from math import pi
 
 class Draw(QWidget):
-    """ A class to represent drawing
-    
-    Attributes
-    ----------
-    self.points : list[QPoint3DF]
-    self.border : list[QPoint3DF]
-    self.dt : list[Edge]
-    self.contours : list[Edge]
-    self.dtmSlope : list[Triangle]
-    self.dtmAspect : list[Triangle]
-    self.viewDT : bool
-    self.viewContourLines : bool
-    self.viewSlope : bool
-    self.viewAspect : bool
-    
-    Methods
-    -------
-    clearAll():
-        Clear all things on the screen
-
-    clearResults():
-        Clear analysis on the screen
-        
-    getPoints():
-        Get points
-        
-    getBorder()
-        Get border points of region
-        
-    setBorder(list : list[QPoin3DF])
-        Set border points
-        
-    getDT()
-        Get Delaunay Triangulation
-        
-    setDT(dt : list[Edge])
-        Set Delaunay triangulation
-    
-    getDTMSlope()
-        Get Slope of Delaunay Triangulation
-        
-    setDTMSlope(dtm_slope : list[Triangle])
-        Set Slope of Delaunay triangulation
-    
-    getDTMAspect()
-        Get Aspect of Delaunay Triangulation
-        
-    setDTMAspect(dtm_aspect : list[Triangle])
-        Set Aspect of Delaunay triangulation
-        
-    setContours(contours : list[Edge])
-        Set Contour Lines of Delaunay triangulation
-        
-    setViewDT(viewDT : bool)
-        Set visibility of Delaunay Triangulation
-        
-    setViewContourLine(viewContourLine : bool)
-        Set visibility of Contour Lines
-        
-    setViewSlope(slope : bool)
-        Set visibility of Slope
-        
-    setViewAspect(aspect : bool)
-        Set visibility of Aspect
-        
-    mousePressEvent(e: QMouseEvent)
-        Method for mouse click
-        
-    paintEvent(e: QPaintEvent)
-        Method for paint event
-    """
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -95,10 +23,8 @@ class Draw(QWidget):
         self.viewContourLines = True
         self.viewSlope = True
         self.viewAspect = True
-     
-    def clearAll(self):
-        """Clear all things on the screen"""
         
+    def clearAll(self):
         # Clear points
         self.points.clear()
         
@@ -109,8 +35,6 @@ class Draw(QWidget):
         self.repaint()
         
     def clearResults(self):
-        """Clear analysis on the screen"""
-        
         # Clear DT
         self.dt.clear()
         
@@ -127,77 +51,49 @@ class Draw(QWidget):
         self.repaint()
         
     def getPoints(self):
-        """Get points"""
-        
         return self.points
     
     def getBorder(self):
-        """Get border points of region"""
         return self.border
     
     def setBorder(self, list : list[QPoint3DF]):
-        """Set border points"""
-        
         self.points = list
     
     def getDT(self):
-        """Get Delaunay Triangulation"""
-        
         # Return DT
         return self.dt
            
     def setDT(self, dt : list[Edge]) -> None:
-        """Set Delaunay triangulation"""
-        
         self.dt = dt
         
     def getDTMSlope(self):
-        """Get Slope of Delaunay Triangulation"""
-        
         return self.dtmSlope
     
     def setDTMSlope(self, dtm_slope : list[Triangle]):
-        """Set Slope of Delaunay triangulation"""
-        
         self.dtmSlope = dtm_slope
 
     def getDTMAspect(self):
-        """Get Aspect of Delaunay Triangulation"""
-        
         return self.dtmAspect
     
     def setDTMAspect(self, dtm_aspect : list[Triangle]):
-        """Set Aspect of Delaunay triangulation"""
-        
         self.dtmAspect = dtm_aspect
 
     def setContours(self, contours : list[Edge]) -> None:
-        """Set Contour Lines of Delaunay triangulation"""
-        
         self.contours = contours
         
     def setViewDT(self, viewDT):
-        """Set visibility of Delaunay Triangulation"""
-        
         self.viewDT = viewDT
         
     def setViewContourLine(self, viewContourLines):
-        """Set visibility of Contour Lines"""
-        
         self.viewContourLines = viewContourLines
         
     def setViewSlope(self, viewSlope):
-        """Set visibility of Slope"""
-        
         self.viewSlope = viewSlope
         
     def setViewAspect(self, viewAspect):
-        """Set visibility of Aspect"""
-        
         self.viewAspect = viewAspect
         
     def mousePressEvent(self, e: QMouseEvent):
-        """Method for mouse click"""
         
         # Get Coordinates
         x = e.position().x()
@@ -218,8 +114,6 @@ class Draw(QWidget):
         self.repaint()
         
     def paintEvent(self, e: QPaintEvent):
-        """Method for paint event"""
-        
         # Draw situation
 
         # Create new draphic object

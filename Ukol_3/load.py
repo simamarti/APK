@@ -5,21 +5,7 @@ from PyQt6 import QtWidgets
 from Algorithms import Algorithms
 
 def loadPoints(path : str) -> list[list[QPoint3DF]]:
-    """Load points from JSON file
-        
-        Parameters
-        ----------
-        path : str
-            Relative address of input file
-            
-        Returns
-        -------
-        painted polygons : list[QPoint3DF]
-            list of points
-        
-        borderpoints : list[QPoint3DF]
-            list of border points
-    """
+    """Load points from JSON file"""
     
     errorText = ""
     try:
@@ -90,17 +76,17 @@ def loadPoints(path : str) -> list[list[QPoint3DF]]:
         # Set brder points as Convex Hull of points
         alg = Algorithms()
         borderPoints = alg.jarvisScan(painted_points)
-        borderPoints = transformPoints(borderPoints, scale, dx, dy, width, height, offset)
+        borderPoints = transformPoints(borderPoints, scale, dx, dy, width, height, offset, qpoint3df = True)
         
     return painted_points, borderPoints
 
-def transformPoints(points : list[list], scale : float, dx : float, dy : float, width : int, height : int, offset : int) -> list[QPoint3DF]:
+def transformPoints(points : list[list], scale : float, dx : float, dy : float, width : int, height : int, offset : int, qpoint3df = False) -> list[QPoint3DF]:
     """Transform polygons to new coordinates which are compatible with canvas coordinates
         
         Parameters
         ----------
         points : list[list]
-            list of list coordinates
+            list of list with points
         scale : float
             scale factor for transformation
         dx : float
@@ -113,16 +99,19 @@ def transformPoints(points : list[list], scale : float, dx : float, dy : float, 
             height of canvas
         offset : int
             offset for drawing on the canvas
-            
+        qpoint3df : bool (optional)
+            input is list QPoint3DF
         Returns
         -------
-        painted polygons : list[QPoints3DF]
-            list of points with transformed coordinates
+        painted polygons : list[Polygon]
+            list of polygons with transformed coordinates
     """
     painted_points = []    
     for point in points:
-        
-        x = point[0]; y = point[1]; z = point[2]
+        if qpoint3df:
+            x = point.x(); y = point.y(); z = point.getZ()
+        else:
+            x = point[0]; y = point[1]; z = point[2]
         
         # Check if string is float (e. g. -0.123)
         if not isNumber(x) or not isNumber(y) or not isNumber(z):
@@ -137,18 +126,8 @@ def transformPoints(points : list[list], scale : float, dx : float, dy : float, 
     return painted_points
 
 def isNumber(string : str | int | float) -> bool:
-    """Check if string is number (float e. g. -0.123)
-        
-        Parameters
-        ----------
-        string : str | int | float
-            String whitch should represent number
-            
-        Returns
-        -------
-        True: String is float
-        Fase: String is not float
-    """
+    """Check if string is number (float e. g. -0.123)"""
+    
     # Is it float or int?
     if isinstance(string, float) or isinstance(string, int):
         return True

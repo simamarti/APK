@@ -168,10 +168,8 @@ class Ui_MainWindow(object):
         
         self.Canvas.clearAll()
         self.Canvas.points, self.Canvas.border = loadPoints(filename)
-    
+      
     def createDTMClick(self):
-        """Create Delaunay triangulation on click"""
-        
         # Get points
         points = self.Canvas.getPoints()
         
@@ -182,10 +180,10 @@ class Ui_MainWindow(object):
         # Create triangulation
         alg = Algorithms()
         dt = alg.createDT(points)
-        print(len(dt))
+        
         # Clip dt by border
         dt = alg.clipDt(dt, self.Canvas.getBorder())
-        print(len(dt))
+        
         # Upadate DT
         self.Canvas.setDT(dt)
         
@@ -196,8 +194,6 @@ class Ui_MainWindow(object):
         self.actionDTM.setChecked(True)
         
     def createContourLinesClick(self):
-        """Create Contour Lines on click"""
-        
         # Get Delaunay triangulation
         alg = Algorithms()
 
@@ -222,7 +218,7 @@ class Ui_MainWindow(object):
             # Set results
             self.Canvas.setDT(dt)
                 
-        # Get contour lines parameters from dialog window
+        # Get contour lines parameters
         zmin = float(self.ui.minVal.text())
         zmax = float(self.ui.maxVal.text())
         dz = float(self.ui.intVal.text())
@@ -240,8 +236,6 @@ class Ui_MainWindow(object):
         self.actionContour_line.setChecked(True)
         
     def analyzeSlopeClick(self):
-        """Analyze slope on click"""
-        
         # Get Delaunay triangulation
         alg = Algorithms()
 
@@ -279,8 +273,6 @@ class Ui_MainWindow(object):
         self.actionSlope.setChecked(True)
         
     def analyzeAspectClick(self):
-        """Create Aspect on click"""
-        
         # Get Delaunay triangulation
         alg = Algorithms()
 
@@ -318,8 +310,6 @@ class Ui_MainWindow(object):
         self.actionExposition.setChecked(True)
     
     def clearClick(self):
-        """Clear analysis"""
-        
         # Clear results
         self.Canvas.clearResults()
         
@@ -327,8 +317,6 @@ class Ui_MainWindow(object):
         self.Canvas.repaint()
     
     def clearAllClick(self):
-        """Clear all"""
-        
         # Clear all data
         self.Canvas.clearAll()
         
@@ -336,8 +324,6 @@ class Ui_MainWindow(object):
         self.Canvas.repaint()
     
     def viewDTMClick(self):
-        """Change visibility of Delaunay triangulation"""
-        
         # Enable/disable DTM
         self.Canvas.setViewDT(self.actionDTM.isChecked())
         
@@ -345,8 +331,6 @@ class Ui_MainWindow(object):
         self.Canvas.update()
     
     def viewContourLineClick(self):
-        """Change visibility of Contour Lines"""
-        
         # Enable/disable Contour lines
         self.Canvas.setViewContourLine(self.actionContour_line.isChecked())
         
@@ -354,8 +338,6 @@ class Ui_MainWindow(object):
         self.Canvas.update()
     
     def viewSlopeClick(self):
-        """Change visibility of Slope"""
-        
         # Enable/disable Slope
         self.Canvas.setViewSlope(self.actionSlope.isChecked())
         
@@ -363,8 +345,6 @@ class Ui_MainWindow(object):
         self.Canvas.update()
     
     def viewExpositionClick(self):
-        """Change visibility of Exposition"""
-        
         # Enable/disable Exposition
         self.Canvas.setViewAspect(self.actionExposition.isChecked())
 
@@ -372,10 +352,11 @@ class Ui_MainWindow(object):
         self.Canvas.update()
     
     def setParameters(self):
-        """Set parameters for creating Contour Lines using Dialog window"""
-        
         self.settings.show()
     
+    def setColors(self):
+        self.color.show()
+        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "DTM Analysis"))
@@ -383,6 +364,7 @@ class Ui_MainWindow(object):
         self.menuAnalysis.setTitle(_translate("MainWindow", "Analysis"))
         self.menuView.setTitle(_translate("MainWindow", "View"))
         self.menuClear.setTitle(_translate("MainWindow", "Clear"))
+        self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
@@ -396,6 +378,8 @@ class Ui_MainWindow(object):
         self.actionExposition.setText(_translate("MainWindow", "Exposition"))
         self.actionClear_results.setText(_translate("MainWindow", "Clear results"))
         self.actionClear_all.setText(_translate("MainWindow", "Clear all"))
+        self.actionParameters.setText(_translate("MainWindow", "Parameters"))
+        self.actionParameters.setToolTip(_translate("MainWindow", "Parameters settings"))
 from Draw import Draw 
 
 

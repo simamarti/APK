@@ -12,65 +12,11 @@ from numpy import array
 
 
 class Algorithms:
-    """ A class for algorithms
-    
-    Attributes
-    ----------
-    None
-    
-    Methods
-    -------
-    getPointLinePosition(p, p1, p2):
-        Analyze position of point and line
-        
-    getNearestPoint(q, points):
-        Get nearest point to q
-         
-    getTwoLineAngle(p1, p2, p3, p4):
-        Compute angle between two lines
-        
-    getDelaunayPoint(start, end, points):
-        Get suitable Delaunay point    
-    
-    updateAEL(e, ael):
-        Update AEL (Active Edge List)
-    
-    createDT(self, points):
-        Create Delaunay triangulation
-    
-    getContourPoint(p1, p2, z):
-        Get contour point
-    
-    createContourLines(dz, zmin, zmax, dt):
-        Create contour lines for all region
-    
-    computeSlope(p1, p2, p3):
-        Compute slope of Triangle
-    
-    computeAspect(p1, p2, p3):
-        Compute Aspect of Triangle
-    
-    analyzeDTMSlope(dt):
-        Analyze slope for all region
-    
-    analyzeDTMAspect(dt):
-        Analyze Aspect for all region
-        
-    rayCrossingAlgorithm(q, polygon):
-        Ray Crossing Algorithm for decide if point is inside of region
-    
-    clipDt(self, dt, border):
-        Clip Delaunay triangulation by convex/non-convex polygon
-
-    jarvisScan(pol):
-        Jarvis Scan
-    """
     
     def __init__(self):
         pass
     
     def getPointLinePosition(self, p : QPoint3DF, p1 : QPoint3DF, p2 : QPoint3DF):
-        """Analyze position of point and line"""
         
         ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
         vx = p.x() - p1.x(); vy = p.y() - p1.y()
@@ -90,7 +36,6 @@ class Algorithms:
         return -1
         
     def getNearestPoint(self, q : QPoint3DF, points : list[QPoint3DF]) -> QPoint3DF:
-        """Get nearest point to q"""
         # Find point nearest to q
         
         pNearest = None
@@ -110,8 +55,6 @@ class Algorithms:
         return pNearest
     
     def getTwoLineAngle(self, p1 : QPointF, p2 : QPointF, p3 : QPointF, p4 : QPointF) -> float:
-        """Compute angle between two lines"""
-        
         # Get two line angle
         ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
         vx = p4.x() - p3.x(); vy = p4.y() - p3.y()
@@ -125,8 +68,6 @@ class Algorithms:
         return acos(afi)
     
     def getDelaunayPoint(self, start : QPoint3DF, end : QPoint3DF, points : list[QPoint3DF]):
-        """Get suitable Delaunay point"""
-        
         # Delaunay point to edge
         pDt = None
         angleMax = 0
@@ -149,8 +90,6 @@ class Algorithms:
         return pDt
     
     def updateAEL(self, e : Edge, ael : list[Edge]) -> list[Edge]:
-        """Update AEL (Active Edge List)"""
-        
         e_op = e.switchOriantation()
         if e_op in ael:
             ael.remove(e_op)
@@ -158,8 +97,6 @@ class Algorithms:
             ael.append(e)
     
     def createDT(self, points : list[QPoint3DF]) -> list[Edge]:
-        """Create Delaunay triangulation"""
-        
         # Create Delaunay triangulation with incremental method
         
         ael : list[Edge] = []
@@ -208,8 +145,6 @@ class Algorithms:
         return dt
     
     def getContourPoint(self, p1 : QPoint3DF, p2 : QPoint3DF, z : float) -> QPoint3DF:
-        """Get contour point"""
-        
         # Intersection of triangle and intersection plane
         
         xb = (p2.x() - p1.x())/(p2.getZ() - p1.getZ()) * (z-p1.getZ()) + p1.x()
@@ -218,8 +153,6 @@ class Algorithms:
         return QPoint3DF(xb, yb, z)
     
     def createContourLines(self, dz : int, zmin : float, zmax : float, dt : list[Edge]) -> list[Edge]:
-        """Create contour lines for all region"""
-        
         # Create contour lines defined by interval and step
         
         contours : list[Edge] = []
@@ -290,8 +223,6 @@ class Algorithms:
         return contours
 
     def computeSlope(self, p1 : QPoint3DF, p2 : QPoint3DF, p3 : QPoint3DF):
-        """Compute slope of Triangle"""
-        
         # Compute triangle sope
 
         # Direction
@@ -309,8 +240,6 @@ class Algorithms:
         return acos(abs(nz)/norm)
     
     def computeAspect(self, p1 : QPoint3DF, p2 : QPoint3DF, p3 : QPoint3DF):
-        """Compute Aspect of Triangle"""
-        
         # Direction
         ux = p1.x() - p2.x(); uy = p1.y() - p2.y(); uz = p1.getZ() - p2.getZ()
         vx = p3.x() - p2.x(); vy = p3.y() - p2.y(); vz = p3.getZ() - p2.getZ()
@@ -322,8 +251,7 @@ class Algorithms:
         return atan2(nx, ny)
     
     def analyzeDTMSlope(self, dt : list[Edge]):
-        """Analyze slope for all region"""
-        
+    
         dtm_slope : list[Triangle] = []
 
         for i in range(0, len(dt), 3):          # Iterate through all triangles
@@ -341,8 +269,7 @@ class Algorithms:
         return dtm_slope
     
     def analyzeDTMAspect(self, dt : list[Edge]):
-        """Analyze Aspect for all region"""
-        
+    
         dtm_aspect : list[Triangle] = []
 
         for i in range(0, len(dt), 3):          # Iterate through all triangles
@@ -360,7 +287,7 @@ class Algorithms:
         return dtm_aspect
     
     def rayCrossingAlgorithm(self, q : QPoint3DF, polygon : list[QPoint3DF]) -> int:
-        """Ray Crossing Algorithm for decide if point is inside of region
+        """Ray Crossing algorithm 
             
         Parameters
         ----------
@@ -442,6 +369,19 @@ class Algorithms:
                 dt_clipped.append(dt[i + 2])
                 
         return dt_clipped
+    
+    def getTwoLineAngle(self, p1 : QPoint3DF, p2 : QPoint3DF, p3 : QPoint3DF, p4 : QPoint3DF) -> float:
+        # Get two line angle
+        ux = p2.x() - p1.x(); uy = p2.y() - p1.y()
+        vx = p4.x() - p3.x(); vy = p4.y() - p3.y()
+        
+        dot = ux*vx + uy*vy
+        nu = (ux**2 + uy**2)**0.5
+        nv = (vx**2 + vy**2)**0.5
+        
+        afi = min(max(dot/(nu*nv), -1), 1)
+        
+        return acos(afi)
     
     def jarvisScan(self, pol : list[QPoint3DF]) -> list[QPoint3DF]:
         # Convex Hull constructed using Jarvis scan
