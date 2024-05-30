@@ -239,7 +239,17 @@ class Draw(QWidget):
                 aspect = aspect*180/pi
 
                 # Corvert Aspect to color using HSV color model
-                color = QColor.fromHsv((int(aspect) - int(aspect)%22 + 11)%359, 255, 255, 255)
+                hue = 0
+                if aspect > 337.5 or aspect <= 22.5:    hue = 0
+                elif aspect <= 67.5:                    hue = 45
+                elif aspect <= 112.5:                   hue = 90
+                elif aspect <= 157.5:                   hue = 135
+                elif aspect <= 202.5:                   hue = 180
+                elif aspect <= 247.5:                   hue = 225
+                elif aspect <= 292.5:                   hue = 270
+                elif aspect <= 337.5:                   hue = 315
+
+                color = QColor.fromHsv(hue, 255, 255, 255)
                 qp.setBrush(color)
 
                 # Draw triangle
@@ -250,11 +260,12 @@ class Draw(QWidget):
             qp.setPen(Qt.GlobalColor.gray)
             for t in self.dtmSlope:
                 slope = t.getSlope()
-
+                
                 # Convert slope to color
                 mju = 510/pi
                 col = int(255 - mju*slope)
                 color = QColor(col, col, col)
+                
                 qp.setBrush(color)
 
                 # Draw triangle

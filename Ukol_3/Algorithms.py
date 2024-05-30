@@ -304,7 +304,6 @@ class Algorithms:
 
         # Norm
         norm = (nx**2 + ny**2 + nz**2)**(1/2)
-
         return acos(abs(nz)/norm)
 
     def computeAspect(self, p1 : QPoint3DF, p2 : QPoint3DF, p3 : QPoint3DF):
