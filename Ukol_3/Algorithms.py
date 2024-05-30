@@ -232,8 +232,9 @@ class Algorithms:
             # Create all conture lines
             for z in arange(zmin, zmax, dz):
                 # Compute edges' height differences
-                dz1 = z - z1; dz2 = z - z2; dz3 = z - z3
 
+                dz1 = z - z1; dz2 = z - z2; dz3 = z - z3
+                
                 # Skip coplanar triangle
                 if dz1 == 0 and dz2 == 0 and dz3 ==0:
                     continue

@@ -137,7 +137,7 @@ def transformPoints(points : list[list], scale : float, dx : float, dy : float, 
         # Transform coordinates
         new_x = (float(x) - dx)/scale + width/2
         new_y = (-1)*((float(y) - dy)/scale + height/2) + height - offset
-        pt = QPoint3DF(new_x, new_y, z)
+        pt = QPoint3DF(new_x, new_y, float(z))
         painted_points.append(pt)
 
     return painted_points
