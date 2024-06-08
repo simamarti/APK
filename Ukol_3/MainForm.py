@@ -189,11 +189,12 @@ class Ui_MainWindow(object):
         # Upadate DT
         self.Canvas.setDT(dt)
 
+        # Check menu item
+        self.actionDTM.setChecked(True)
+        
         # Repaint screen
         self.Canvas.repaint()
 
-        # Check menu item
-        self.actionDTM.setChecked(True)
 
     def createContourLinesClick(self):
         """Create Contour Lines on click"""
@@ -232,12 +233,12 @@ class Ui_MainWindow(object):
 
         # Set results
         self.Canvas.setContours(contours)
-
-        # Repaint screen
-        self.Canvas.repaint()
-
+        
         # Check menu item
         self.actionContour_line.setChecked(True)
+        
+        # Repaint screen
+        self.Canvas.repaint()
 
     def analyzeSlopeClick(self):
         """Analyze slope on click"""
@@ -272,12 +273,12 @@ class Ui_MainWindow(object):
         # Set results
         self.Canvas.setDTMSlope(slope)
 
-        # Repaint screen
-        self.Canvas.repaint()
-
         # Check menu item
         self.actionSlope.setChecked(True)
-
+        
+        # Repaint screen
+        self.Canvas.repaint()
+        
     def analyzeAspectClick(self):
         """Create Aspect on click"""
 
@@ -311,12 +312,12 @@ class Ui_MainWindow(object):
         # Set results
         self.Canvas.setDTMAspect(aspect)
 
-        # Repaint screen
-        self.Canvas.repaint()
-
         # Check menu item
         self.actionExposition.setChecked(True)
 
+        # Repaint screen
+        self.Canvas.repaint()
+        
     def clearClick(self):
         """Clear analysis"""
 

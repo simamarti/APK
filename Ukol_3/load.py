@@ -47,19 +47,19 @@ def loadPoints(path : str) -> list[list[QPoint3DF]]:
 
     except FileNotFoundError:
         errorText = "File has not been found"
-        return []
+        return [], []
     except KeyError:
         errorText = "JSON file has not proper structure."
-        return []
+        return [], []
     except PermissionError:
         errorText = "You have not permissions to open file."
-        return []
+        return [], []
     except IndexError:
         errorText = "Wrong format of data."
-        return []
+        return [], []
     except IOError:
         errorText = "Error during input."
-        return []
+        return [], []
 
     finally:   
         if errorText != "":

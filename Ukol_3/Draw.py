@@ -275,7 +275,7 @@ class Draw(QWidget):
         qp.setBrush(Qt.GlobalColor.transparent)
 
         if self.viewContourLines:
-            qp.setBrush(Qt.GlobalColor.green)
+            qp.setPen(QColor(139,69,19))
             # Draw contour lines
             for e in self.contours:
                 qp.drawLine(int(e.getStart().x()), int(e.getStart().y()), int(e.getEnd().x()), int(e.getEnd().y()))
