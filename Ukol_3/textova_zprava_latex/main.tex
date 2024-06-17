@@ -220,6 +220,9 @@ $$A = arctan (\frac{a}{b})$$
     \end{algorithmic}
 \end{algorithm}
 
+\subsection{Triangulace nekonvexní oblasti}
+Při triangulace nekonvexní oblasti je nejdřive provedena obyčejná triangulace, která vytvoří triangulaci uvnitř konvexní obálky všech bodů. V dalším kroku je tato triangulace upravena pomocí funkce \textit{clipDT}, kde je pro každý trojúhelník spočítán centroid. Pokud tento centroid leží uvnitř nekonvexní oblasti, příslušný trojúhelník je  vyřazen  z triangulace. Poloha bodu vůči polygonu je určována pomocí Ray Crossing algoritmu.
+
 \section{Struktura programu}
 Program se skládá z 10 souborů, kterými jsou \textit{Data}, \textit{Images}, \textit{Algorithms}, \textit{Draw}, \textit{Edge}, \textit{load},\textit{ MainForm}, \textit{QPoint3DF}, \textit{Settings} a \textit{Triangle}.
 
@@ -243,7 +246,10 @@ Soubor \textit{QPoint3DF.py} obsahuje implementaci třídy QPoint3DF reprezentuj
 
 Soubor \textit{Load.py} obsahuje tři metody obsluhující načítání dat. Samotné načítání bodů je umožněno pomocí metody \textit{loadPoints}, v prvním kroku je ze všech bodů vypočten minmax box, z kterého je vypočten posun na jednotlivých osách a škálovací faktor. Body jsou následně transformovány pomocí funkce \textit{transformPoints}. Kontrola vstupních dat probíhá pomocí funkce \textit{isNumber}.
 
-\newpage
+Výstupy jednotlivých analýz jsou vykreslovány ve vrstvách. Od nejsvrchnějších vrstev to jsou digitální model terénu, vrstevnice, sklon terénu a orientace. Digitální model terénu  a vrstevnice jsou vykresleny pouze jako liniové prvky. Sklon a orientace jsou polygonové vrstvy, tudíž po provedení všech analýz a~zobrazení všech vrstev není vrstva orientace vidět.
+
+
+%\newpage
 \section{Výsledky}
 V rámci této úlohy došlo k vytvoření uživatelského rozhraní s využitím frameworku QT, ve kterém lze vytvořit digitální model terénu s využitím algoritmů popsaných v teoretické části této zprávy. Toto grafické rozhraní aplikace vytvořené v prostředí Qt Designer lze vidět na obrázku 1 a dále bylo upravováno v prostředí programovacího jazyka Python. Po spuštění aplikace může uživatel otevřít soubor obsahující bodové mračno.
 
@@ -258,7 +264,7 @@ Prvním krokem při tvorbě digitálního modelu terénu (DMT) a jeho analýz je
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.45\linewidth]{images/02triangulace.png}
+    \includegraphics[width=0.4\linewidth]{images/02triangulace.png}
     \caption{Výsledek Delaunay triangulace}
     \label{fig:enter-label}
 \end{figure}
@@ -273,21 +279,21 @@ Z důvodu různé výškové členitosti bodového mračna je potřeba nastavit 
     \label{fig:enter-label}
 \end{figure}
 
+\newpage
 Další analyzovanou vlastností námi vytvořeného digitálního modelu terénu byl sklon jednotlivých trojúhelníků, který je znázorněn odstíny šedi. Světlé plochy značí rovinaté oblasti, zatímco tmavé plochy reprezentují strmé oblasti. Výsledek sklonu lze vidět na obrázku 4. 
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.45\linewidth]{images/04sklon.png}
+    \includegraphics[width=0.4\linewidth]{images/04sklon.png}
     \caption{Výsledek analýzy sklonu}
     \label{fig:enter-label}
 \end{figure}
 
-\newpage
 Poslední analyzovanou vlastností digitálního modelu terénu byla orientace vůči světovým stranám, kterou lze vidět na obrázku 5. Pro vizualizaci orientace vůči světovým stranám byla využita barevná stupnice, kterou lze vidět na obrázku 6, kde tyrkysová značí sever, limetková východ, červená jih a fialová západ.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.45\linewidth]{images/05orientace.png}
+    \includegraphics[width=0.4\linewidth]{images/05orientace.png}
     \caption{Výsledek analýzy orientace vůči světovým stranám}
     \label{fig:enter-label}
 \end{figure}
