@@ -16,10 +16,13 @@ class Draw(QWidget):
     ----------
     self.points : list[QPoint3DF]
     self.border : list[QPoint3DF]
+    self.hole : list[QPoint3DF]
     self.dt : list[Edge]
     self.contours : list[Edge]
     self.dtmSlope : list[Triangle]
     self.dtmAspect : list[Triangle]
+    self.createBorderSwitch : bool
+    self.createHoleSwitch : bool
     self.viewDT : bool
     self.viewContourLines : bool
     self.viewSlope : bool
@@ -37,9 +40,24 @@ class Draw(QWidget):
         
     getBorder()
         Get border points of region
+    
+    getHole()
+        Get Hole
         
     setBorder(list : list[QPoin3DF])
         Set border points
+    
+    switchHole():
+        switch between creating hole in points
+    
+    getSwtichHole():
+        Get hole status
+        
+    switchBorder():
+        switch between creating border of points
+    
+    getSwtichBorder():
+        Get border status
         
     getDT()
         Get Delaunay Triangulation
@@ -86,10 +104,13 @@ class Draw(QWidget):
 
         self.points : list[QPoint3DF] = []
         self.border : list[QPoint3DF] = []
+        self.hole : list[QPoint3DF] = []
         self.dt : list[Edge] = []
         self.contours : list[Edge] = []
         self.dtmSlope : list[Triangle] = []
         self.dtmAspect : list[Triangle] = []
+        self.createHoleSwitch : bool = False
+        self.createBorderSwitch : bool = False
         self.viewDT = True
         self.viewContourLines = True
         self.viewSlope = True
@@ -100,6 +121,12 @@ class Draw(QWidget):
 
         # Clear points
         self.points.clear()
+        
+        # Clear border
+        self.border.clear()
+        
+        # Clear hole
+        self.hole.clear()
 
         # Clear results
         self.clearResults()
@@ -134,11 +161,34 @@ class Draw(QWidget):
         """Get border points of region"""
         return self.border
 
+    def getHole(self):
+        """Get Hole"""
+        
+        return self.hole
+        
     def setBorder(self, list : list[QPoint3DF]):
         """Set border points"""
 
         self.points = list
 
+    def switchHole(self):
+        """switch between creating hole in points"""
+
+        self.createHoleSwitch = not self.createHoleSwitch
+    
+    def getSwitchHole(self):
+        """Get Hole status"""
+        return self.createHoleSwitch
+    
+    def switchBorder(self):
+        """switch between creating border of points"""
+
+        self.createBorderSwitch = not self.createBorderSwitch
+    
+    def getSwtichBorder(self):
+        """Get Border status"""
+        return self.createBorderSwitch
+       
     def getDT(self):
         """Get Delaunay Triangulation"""
 
@@ -206,12 +256,23 @@ class Draw(QWidget):
         zmin = 150
         zmax = 1600
         z = random() * (zmax - zmin) + zmin
-
+        
         # Add new point
         p = QPoint3DF(x, y, z)
 
-        # Add point to building
-        self.points.append(p)
+        if self.getSwitchHole():
+            
+            # Add point to hole
+            self.hole.append(p)
+            
+        elif self.getSwtichBorder():
+            
+            # Add point to border
+            self.border.append(p)
+        else:
+            
+            # Add point to DTM
+            self.points.append(p)
 
         # Repaint screen
         self.repaint()
@@ -223,7 +284,7 @@ class Draw(QWidget):
 
         # Create new draphic object
         qp = QPainter(self)
-
+        
         # Start drawing
         qp.begin(self)
 
@@ -298,5 +359,28 @@ class Draw(QWidget):
         for p in self.points:
             qp.drawEllipse(int(p.x()) - r, int(p.y()) - r, 2*r, 2*r)
 
+
+        # Draw hole
+        # Set atributes
+        qp.setPen(Qt.GlobalColor.red)
+        qp.setBrush(QColor(240, 240, 240))
+
+        n = len(self.border)
+        for idx in range(n):
+            p1 = self.border[idx]
+            p2 = self.border[(idx + 1)%n]
+
+            qp.drawLine(int(p1.x()), int(p1.y()), int(p2.x()), int(p2.y()))
+            
+        qp.setPen(Qt.GlobalColor.blue)
+
+        n = len(self.hole)
+        pol =QPolygonF()
+        for idx in range(n):
+            p = self.hole[idx]
+
+            pol.append(QPointF(p.x(), p.y()))
+        
+        qp.drawPolygon(pol)
         # End drawing
         qp.end()

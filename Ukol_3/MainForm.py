@@ -101,6 +101,18 @@ class Ui_MainWindow(object):
         icon8.addPixmap(QtGui.QPixmap("./images/icons/settings.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionParameters.setIcon(icon8)
         self.actionParameters.setObjectName("actionParameters")
+        self.actionCreate_hole = QtGui.QAction(parent=MainWindow)
+        self.actionCreate_hole.setCheckable(True)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap("./images/icons/Hole.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.actionCreate_hole.setIcon(icon9)
+        self.actionCreate_hole.setObjectName("actionCreate_hole")
+        self.actionCreate_border = QtGui.QAction(parent=MainWindow)
+        self.actionCreate_border.setCheckable(True)
+        icon10 = QtGui.QIcon()
+        icon10.addPixmap(QtGui.QPixmap("./images/icons/Border.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.actionCreate_border.setIcon(icon10)
+        self.actionCreate_border.setObjectName("actionCreate_border")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionClose)
@@ -109,6 +121,9 @@ class Ui_MainWindow(object):
         self.menuAnalysis.addAction(self.actionCreate_contour_lines)
         self.menuAnalysis.addAction(self.actionAnalyze_slope)
         self.menuAnalysis.addAction(self.actionAnalyze_exposition)
+        self.menuAnalysis.addSeparator()
+        self.menuAnalysis.addAction(self.actionCreate_hole)
+        self.menuAnalysis.addAction(self.actionCreate_border)
         self.menuView.addAction(self.actionDTM)
         self.menuView.addAction(self.actionContour_line)
         self.menuView.addAction(self.actionSlope)
@@ -128,6 +143,9 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionCreate_contour_lines)
         self.toolBar.addAction(self.actionAnalyze_slope)
         self.toolBar.addAction(self.actionAnalyze_exposition)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actionCreate_hole)
+        self.toolBar.addAction(self.actionCreate_border)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionClear_results)
         self.toolBar.addAction(self.actionClear_all)
@@ -153,6 +171,8 @@ class Ui_MainWindow(object):
         self.actionContour_line.triggered.connect(self.viewContourLineClick)
         self.actionSlope.triggered.connect(self.viewSlopeClick)
         self.actionCreate_contour_lines.triggered.connect(self.createContourLinesClick)
+        self.actionCreate_hole.triggered.connect(self.createHoleClick) # type: ignore
+        self.actionCreate_border.triggered.connect(self.createBorderClick) # type: ignore
 
 
         self.actionClose.triggered.connect(MainWindow.close) # type: ignore
@@ -183,8 +203,11 @@ class Ui_MainWindow(object):
         alg = Algorithms()
         dt = alg.createDT(points)
 
-        # Clip dt by border
-        dt = alg.clipDt(dt, self.Canvas.getBorder())
+        if not self.Canvas.getBorder():
+            self.Canvas.setBorder(alg.jarvisScan(points))
+            
+        # Clip dt by border and hole
+        dt = alg.clipDt(dt, self.Canvas.getBorder(), self.Canvas.getHole())
 
         # Upadate DT
         self.Canvas.setDT(dt)
@@ -194,7 +217,6 @@ class Ui_MainWindow(object):
         
         # Repaint screen
         self.Canvas.repaint()
-
 
     def createContourLinesClick(self):
         """Create Contour Lines on click"""
@@ -217,12 +239,15 @@ class Ui_MainWindow(object):
             # Create DT
             dt = alg.createDT(points)
 
-            # Clip dt by border
-            dt = alg.clipDt(dt, self.Canvas.getBorder())
-
+            if not self.Canvas.getBorder():
+                self.Canvas.setBorder(alg.jarvisScan(points))
+            
+            # Clip dt by border and hole
+            dt = alg.clipDt(dt, self.Canvas.getBorder(), self.Canvas.getHole())
+        
             # Set results
             self.Canvas.setDT(dt)
-
+        
         # Get contour lines parameters from dialog window
         zmin = float(self.ui.minVal.text())
         zmax = float(self.ui.maxVal.text())
@@ -230,7 +255,8 @@ class Ui_MainWindow(object):
 
         # Create contour lines
         contours = alg.createContourLines(dz, zmin, zmax, self.Canvas.getDT())
-
+        print(f"Počet vrstevnic: {len(contours)}")
+        
         # Set results
         self.Canvas.setContours(contours)
         
@@ -261,9 +287,12 @@ class Ui_MainWindow(object):
             # Create DT
             dt = alg.createDT(points)
 
-            # Clip dt by border
-            dt = alg.clipDt(dt, self.Canvas.getBorder())
-
+            if not self.Canvas.getBorder():
+                self.Canvas.setBorder(alg.jarvisScan(points))
+            
+            # Clip dt by border and hole
+            dt = alg.clipDt(dt, self.Canvas.getBorder(), self.Canvas.getHole())
+            
             # Set results
             self.Canvas.setDT(dt)
 
@@ -300,9 +329,12 @@ class Ui_MainWindow(object):
             # Create DT
             dt = alg.createDT(points)
 
-            # Clip dt by border
-            dt = alg.clipDt(dt, self.Canvas.getBorder())
-
+            if not self.Canvas.getBorder():
+                self.Canvas.setBorder(alg.jarvisScan(points))
+            
+            # Clip dt by border and hole
+            dt = alg.clipDt(dt, self.Canvas.getBorder(), self.Canvas.getHole())
+            
             # Set results
             self.Canvas.setDT(dt)
 
@@ -317,7 +349,39 @@ class Ui_MainWindow(object):
 
         # Repaint screen
         self.Canvas.repaint()
+    
+    def createHoleClick(self):
+        """Hole is / is not created"""
         
+        self.Canvas.switchHole() 
+        
+        
+        if self.Canvas.getSwitchHole():
+            
+            # Clear border if Create Hle is turn on
+            self.Canvas.hole.clear()
+            
+            # Only Border or Hole can be drawn in one time
+            self.actionCreate_border.setChecked(False)
+            self.Canvas.createBorderSwitch = False
+       
+    def createBorderClick(self):
+        """Border is / is not created"""
+        self.Canvas.switchBorder() 
+        
+        
+        if self.Canvas.getSwtichBorder():
+            
+            # Clear border if Create Hle is turn on
+            self.Canvas.border.clear()
+       
+            # Only Border or Hole can be drawn in one time
+            self.actionCreate_hole.setChecked(False)
+            self.Canvas.createHoleSwitch = False
+
+        # Repaint screen
+        self.Canvas.repaint()
+
     def clearClick(self):
         """Clear analysis"""
 
@@ -397,6 +461,8 @@ class Ui_MainWindow(object):
         self.actionExposition.setText(_translate("MainWindow", "Exposition"))
         self.actionClear_results.setText(_translate("MainWindow", "Clear results"))
         self.actionClear_all.setText(_translate("MainWindow", "Clear all"))
+        self.actionCreate_hole.setText(_translate("MainWindow", "Create hole"))
+        self.actionCreate_border.setText(_translate("MainWindow", "Create border"))
 from Draw import Draw 
 
 

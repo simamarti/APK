@@ -2,8 +2,8 @@ from PyQt6.QtCore import QPointF
 
 class QPoint3DF(QPointF):
     def __init__(self, x : float, y : float, z : float) -> None:
-        super().__init__(x, y)
-        self.z = z
+        super().__init__(float(x), float(y))
+        self.z = float(z)
         
     def __eq__(self, other) -> bool:
         """Overloaded equal operator"""

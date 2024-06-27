@@ -59,7 +59,10 @@ class Algorithms:
     rayCrossingAlgorithm(q, polygon):
         Ray Crossing Algorithm for decide if point is inside of region
     
-    clipDt(self, dt, border):
+    intesectionTwoLines(self, p1, p2, pol):
+        Check intersection of lines
+        
+    clipDt(self, dt, border, hole):
         Clip Delaunay triangulation by convex/non-convex polygon
     jarvisScan(pol):
         Jarvis Scan
@@ -358,7 +361,7 @@ class Algorithms:
 
         return dtm_aspect
 
-    def rayCrossingAlgorithm(self, q : QPoint3DF, polygon : list[QPoint3DF]) -> int:
+    def rayCrossingAlgorithm(self, q : QPoint3DF, polygon : list[QPoint3DF]) -> bool:
         """Ray Crossing Algorithm for decide if point is inside of region
             
         Parameters
@@ -370,8 +373,8 @@ class Algorithms:
             
         Returns
         -------
-        0: Point is in the polygon
-        1: Point is outside the polygon
+        True: Point is in the polygon
+        False: Point is outside the polygon
         """
 
         # Inicialize amount of intersection
@@ -393,7 +396,7 @@ class Algorithms:
 
             # Point is vertex
             if abs(xir) < eps and abs(yir) < eps:
-                return 1
+                return True
 
             # Ray intersects vertex
             if abs(yir) < eps:
@@ -401,41 +404,86 @@ class Algorithms:
                 if iyr*yiir < 0:
                     k = k + 1
 
-                # Point is on the Edge
-                p_1 = array([xir, yir])
-                p_2 = array([xiir, yiir])
-                if abs(norm(-p_1) + norm(-p_2) - norm(p_2 - p_1)) < eps:
-                    return 1
+            # Point is on the Edge
+            p_1 = array([xir, yir])
+            p_2 = array([xiir, yiir])
+            if abs(norm(-p_1) + norm(-p_2) - norm(p_2 - p_1)) < eps:
+                return True
 
-                # Suitable segment?
-                if (((yiir > eps) and (yir <= eps)) 
-                    or ((yir > eps) and (yiir <= eps))):
-                    # Compute inersecion
-                    xm = (xir*yiir-xiir*yir)/(yir - yiir)
-                    if xm > eps:
-                        k += 1
+            # Suitable segment?
+            if (((yiir > eps) and (yir <= eps)) 
+                or ((yir > eps) and (yiir <= eps))):
+                # Compute inersecion
+                xm = (xir*yiir-xiir*yir)/(yir - yiir)
+                if xm > eps:
+                    k += 1
+                        
+        # Point inside polygon 
+        if k%2:
+            return True 
+        # Point outside polygon     
+        return False
+    
+    def intesectionTwoLines(self, p1 : QPoint3DF, p2 : QPoint3DF, pol : list[QPoint3DF]) -> bool:
+        """Check intersection of lines"""
+        
+        eps = 1.0e-5        # epsilon for comparing floats
+        
+        x1 = p1.x(); x2 = p2.x()
+        y1 = p1.y(); y2 = p2.y()
+        
+        n = len(pol)
+        for i in range(n):
+            x3 = pol[i].x(); x4 = pol[(i + 1)%n].x()
+            y3 = pol[i].y(); y4 = pol[(i + 1)%n].y()
 
-        # Point inside polygon       
-        return k%2
+            t1 = (x2 - x1)*(y4 - y1) - (x4 - x1)*(y2 - y1)
+            t2 = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1)
+            t3 = (x4 - x3)*(y1 - y3) - (x1 - x3)*(y4 - y3)
+            t4 = (x4 - x3)*(y2 - y3) - (x2 - x3)*(y4 - y3)
+        
+            # Check if vertex of polygon is on the line
+            u_x = x2 - x1; u_y = y2 - y1
+            v_x = x3 - x1; v_y = y3 - y1
+            
+            t = u_x*v_y - v_x*u_y
+            if abs(t) < eps:
+                continue
+            
+            # One of the point of DT is on the border
+            if (abs(x1 - x3) < eps and abs(y1 - y3) < eps) or (abs(x1 - x4) < eps and abs(y1 - y4) < eps) or\
+                (abs(x2 - x3) < eps and abs(y2 - y3) < eps) or (abs(x2 - x4) < eps and abs(y2 - y4) < eps):
+                    continue
+                
+            # Intersection exists
+            if t1*t2 < eps and t3*t4 < eps:
+                return True
 
-    def clipDt(self, dt : list[QPoint3DF], border : list[QPoint3DF]):
+        # Intersection doesn't exist
+        return False
+    
+    def clipDt(self, dt : list[QPoint3DF], border : list[QPoint3DF], hole : list[QPoint3DF]):
         """Clip Delaunay triangulation by convex/non-convex polygon"""
         
         dt_clipped = []
-
+        
+        idx = 0
         for i in range(0, len(dt), 3):          # Iterate through all triangles
             # Get vertices of triangle
             p1 = dt[i].getStart(); p2 = dt[i].getEnd(); p3 = dt[i + 1].getEnd()
+            
+            # If all verticies of Delaunay Triangle is inside of the border (points are inside the border, edges of DT doesn't intersect border)
+            if (self.rayCrossingAlgorithm(p1, border) and self.rayCrossingAlgorithm(p2, border) and self.rayCrossingAlgorithm(p3, border)) and\
+                (not self.intesectionTwoLines(p1, p2, border) and not self.intesectionTwoLines(p2, p3, border) and not self.intesectionTwoLines(p3, p1, border)):
+                
+                # Add Triangle to final triangulation if hole doesn't exist or is outside of triangle (points are outside the hole, edges of DT doesn't intersect hole)
+                if hole == [] or ((not self.rayCrossingAlgorithm(p1, hole) and not self.rayCrossingAlgorithm(p2, hole) and not self.rayCrossingAlgorithm(p3, hole)) and\
+                    (not self.intesectionTwoLines(p1, p2, hole) and not self.intesectionTwoLines(p2, p3, hole) and not self.intesectionTwoLines(p3, p1, hole))):
 
-            # Centroid of triangle
-            cX = (p1.x() + p2.x() + p3.x())/3; cY = (p1.y() + p2.y() + p3.y())/3
-            p = QPoint3DF(cX, cY, 0)
-
-            if not self.rayCrossingAlgorithm(p, border):
-                dt_clipped.append(dt[i])
-                dt_clipped.append(dt[i + 1])
-                dt_clipped.append(dt[i + 2])
-
+                    dt_clipped.append(dt[i])
+                    dt_clipped.append(dt[i + 1])
+                    dt_clipped.append(dt[i + 2])
+        
         return dt_clipped
 
     def jarvisScan(self, pol : list[QPoint3DF]) -> list[QPoint3DF]:
